@@ -1,24 +1,45 @@
 <?php
     class Member extends CI_Controller {
-        public function index() {
+        
+        public function __construct() {
+            parent::__construct(); 
+        }
+
+    public function index() {
             $this->load->model('member_model');//モデルの読み込み
-            $data['members'] = $this->member_model->getMember();//モデルのメソッドからの返り値を代入
+            $data['members'] = $this->member_model->findAll();//モデルのメソッドからの返り値を代入
             
             $this->load->view('index', $data);//viewに$dataを渡す。
         }
         
+        
         public function add() {
-            $first_name = $_POST[first_name];
-            $last_name = $_POST[last_name];
-            $age = $_POST[age];
-            $home = $_POST[home];
+            $this->load->view('add');
+        }    
+           
+        
+        
+        public function create() {
+            $this->load->model('member_model');
             
+            $member = array(
+                'first_name' => $this->input->post('first_name'),
+                'last_name' => $this->input->post('last_name'),
+                'age' => $this->input->post('age'),
+                'home' => $this->input->post('home')
+            );
+            $this->member_model->create($member);
+            $this->load->index();
             
-            $this->member_model->create_member([
-                'first_name' => $first_name,
-                'last_name' => $last_name,
-                'age' => $age,
-                'home' => $home
-            ]);
         }
-    }
+        
+        
+        public function update() {
+            
+        }
+        
+        
+        public function destroy(){
+            
+        }
+}
