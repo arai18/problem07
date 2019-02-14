@@ -6,7 +6,7 @@
 <body>
     <h1>社員一覧画面</h1>
     
-    <h2>新規登録</h2>
+    <h2><a href="http://local.problem07.com/member/add">新規登録</a></h2>
     
     <table border="1">
         <tr>
@@ -22,7 +22,7 @@
         <?php foreach($members as $member): ?>
         <tr>
             <td><?= $member->id ?></td>
-            <td><?= $member->first_name . $member->last_name  ?></td>
+            <td><a href="http://local.problem07.com/member/update/<?php echo $member->id; ?>"><?= $member->first_name . $member->last_name  ?></a></td>
             <td><?= $member->home ?></td>
             <td><a href="#">コメント</a></td>
             <td><a href="#">削除</a></td>

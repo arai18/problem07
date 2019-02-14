@@ -34,12 +34,36 @@
             $this->member_model->create($member);
             $this->index();
             
-        }
-        
-        
-        public function update() {
             
         }
+        
+        
+        public function update($id) {
+            $this->load->model('member_model');
+            
+            $data['member'] = $this->member_model->findById($id);
+            $this->load->view('edit', $data);  
+        }
+        
+        
+        public function edit($data) {
+            $this->load->model('member_model');
+            
+            $updateMember = array(
+                'first_name' => $this->input->post('first_name'),
+                'last_name' => $this->input->post('last_name'),
+                'age' => $this->input->post('age'),
+                'home' => $this->input->post('home')
+            );
+            
+            $id = array(
+                'id' => $this->input->post('id')
+            );
+            
+            $this->member_model->update($updateMember, $id);
+            $this->index;
+        }
+        
         
         
         public function destroy(){

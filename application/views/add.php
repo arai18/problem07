@@ -18,7 +18,7 @@
             <label>出身地</label>
             <input type="text" name="home"><br />
             
-            <input type="submit" value="送信">
+            <input type="submit" value="登録">
             
         </form>
         
