@@ -22,14 +22,17 @@
         public function create() {
             $this->load->model('member_model');
             
+          
             $member = array(
                 'first_name' => $this->input->post('first_name'),
                 'last_name' => $this->input->post('last_name'),
                 'age' => $this->input->post('age'),
                 'home' => $this->input->post('home')
             );
+            
+            
             $this->member_model->create($member);
-            $this->load->index();
+            $this->index();
             
         }
         
