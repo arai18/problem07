@@ -47,24 +47,27 @@
         
         
         public function edit() {
-            $this->load->model('member_model');
+            $this->load->model('member_model');//モデルを読み込む
             
-            $updateMember = array(
-                'first_name' => $this->input->post('first_name'),
-                'last_name' => $this->input->post('last_name'),
-                'age' => $this->input->post('age'),
-                'home' => $this->input->post('home')
+            $updateMember = array(//上書きするデータの配列を作成
+                'first_name' => $this->input->post('first_name'),//first_nameのvalueにinputの値を挿入
+                'last_name' => $this->input->post('last_name'),//last_nameのvalueにinputの値を挿入
+                'age' => $this->input->post('age'),//ageのvalueにinputの値を挿入
+                'home' => $this->input->post('home')//homeのvalueにinputの値を挿入
             );
            
-            $userId =$this->input->post('id');
+            $userId =$this->input->post('id');//memberを特定するidを別で取得する
             
-            $this->member_model->update($updateMember, $userId);
-            $this->index();
+            $this->member_model->update($updateMember, $userId);//member_modelのupdateメソッドで$updateMemberと$userIdを用いデータベースを上書きする。
+            $this->index();//終了後indexアクションを実行させる。
         }
         
         
         
-        public function destroy(){
+        public function destroy($id){//削除するidをパラメータより取得
+            $this->load->model('member_model');//モデルを読み込む
             
+            $this->member_model->delete($id);//member_modelのdeleteメソッドを実行する
+            $this->index();//index();を実行させる
         }
 }
