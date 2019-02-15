@@ -13,8 +13,8 @@ class Member_model extends CI_Model{
         return $this->db->get_where('members', array('id' => $id))->result_array();
     }
     
-    public function update($data, $id) {
-        $this->db->where('id', $id);
+    public function update($data, $userId) {
+        $this->db->where('id', $userId);
         $this->db->update('members', $data);
     }
     
