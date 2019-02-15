@@ -9,12 +9,12 @@
             $this->load->model('member_model');//モデルの読み込み
             $data['members'] = $this->member_model->findAll();//モデルのメソッドからの返り値を代入
             
-            $this->load->view('index', $data);//viewに$dataを渡す。
+            $this->load->view('member/index', $data);//viewに$dataを渡す。
         }
         
         
         public function add() {
-            $this->load->view('add');//add.phpを表示
+            $this->load->view('member/add');//add.phpを表示
         }    
            
         
@@ -42,7 +42,7 @@
             $this->load->model('member_model');//モデルを読み込み
             
             $data['member'] = $this->member_model->findById($id);//パラメータと同じIDを持つmemberをdbより取得
-            $this->load->view('edit', $data);//member情報を持たせ、edit.phpを表示
+            $this->load->view('member/edit', $data);//member情報を持たせ、edit.phpを表示
         }
         
         
@@ -64,10 +64,10 @@
         
         
         
-        public function destroy($id){//削除するidをパラメータより取得
+        public function delete($id){//削除するidをパラメータより取得
             $this->load->model('member_model');//モデルを読み込む
             
-            $this->member_model->delete($id);//member_modelのdeleteメソッドを実行する
+            $this->member_model->destroy($id);//member_modelのdeleteメソッドを実行する
             $this->index();//index();を実行させる
         }
 }

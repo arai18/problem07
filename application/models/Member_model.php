@@ -19,7 +19,7 @@ class Member_model extends CI_Model{
     }
     
     
-    public function delete($id) {//該当するidを持つmemberを削除する
+    public function destroy($id) {//該当するidを持つmemberを削除する
         $this->db->where('id', $id);//該当するidを持つmemberを検索する
         $this->db->delete('members');//membersテーブル内で上記IDのmemberを削除する
     }
