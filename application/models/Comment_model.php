@@ -5,9 +5,9 @@ class Comment_model extends CI_Model{
             parent::__construct(); 
         }
     
-    public function findAll() {
-        $this->load->model('comment_model');
-        $this->comment_model->findAll();
+    public function findAll($user_id) {
+//        $query = $this->db->where('user_id', );
+        
     }
 }
 

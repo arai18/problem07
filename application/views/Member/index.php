@@ -2,6 +2,8 @@
 <html lang="ja">
 <head>
     <title>社員一覧画面</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://local.problem07.com/assets/js/script.js"></script>
 </head>
 <body>
     <h1>社員一覧画面</h1>
@@ -25,13 +27,14 @@
             <td><a href="http://local.problem07.com/member/update/<?php echo $member->id; ?>"><?= $member->first_name . $member->last_name  ?></a></td>
             <td><?= $member->home ?></td>
             <td><a href="http://local.problem07.com/comment/<?php echo $member->id; ?>">コメント</a></td>
-            <td><a href="http://local.problem07.com/member/delete/<?php echo $member->id; ?>">削除</a></td>
+            <td><a href="http://local.problem07.com/member/delete/<?php echo $member->id; ?>" class="delete">削除</a></td>
             <td><?= $member->created ?></td>
             <td><?= $member->modified ?></td>
         </tr>
         
         <?php endforeach; ?>
     </table>
+    
 </body>
     
 </html>
