@@ -5,18 +5,21 @@
     </head>
     <body>
         <h1>社員情報登録</h1>
-        <form action="http://local.problem07.com/member/create" method="post">
+        
+        <?php echo validation_errors(); ?>
+        
+        <form action="http://local.problem07.com/member/add" method="post">
             <label>氏</label>
-            <input type="text" name="first_name"><br />
+            <input type="text" name="first_name" value="<?php echo set_value('first_name'); ?>"><br />
             
             <label>名</label>
-            <input type="text" name="last_name"><br />
+            <input type="text" name="last_name" value="<?php echo set_value('last_name'); ?>"><br />
             
             <label>年齢</label>
-            <input type="text" name="age"><br />
+            <input type="text" name="age" value="<?php echo set_value('age'); ?>"><br />
             
             <label>出身地</label>
-            <input type="text" name="home"><br />
+            <input type="text" name="home" value="<?php echo set_value('home'); ?>"><br />
             
             <input type="submit" value="登録">
             

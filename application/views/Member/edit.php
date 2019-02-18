@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>社員情報登録</title>
+        <title>社員情報更新</title>
     </head>
     <body>
-        <h1>社員情報登録</h1>
+        <h1>社員情報更新</h1>
+        
         <form action="http://local.problem07.com/member/edit" method="post">
             <input type="hidden" name="id" value="<?php echo $member[0]['id'] ;?>">
             <label>氏</label>

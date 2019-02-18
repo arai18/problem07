@@ -5,5 +5,6 @@ class Comment extends CI_Controller {
         $this->comment_model->findAll();
     }
     
+    
 }
 
