@@ -7,8 +7,9 @@
         <h1>社員情報登録</h1>
         
         <?php echo validation_errors(); ?>
+        <?php echo base_url();?>
         
-        <form action="http://local.problem07.com/member/add" method="post">
+        <form action="<?php echo base_url('member/add'); ?>" method="post">
             <label>氏</label>
             <input type="text" name="first_name" value="<?php echo set_value('first_name'); ?>"><br />
             

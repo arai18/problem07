@@ -1,21 +1,30 @@
 <?php
     class Member extends CI_Controller {
         
-        public function __construct() {
+        public function __construct() 
+        {
             parent::__construct(); 
         }
+        
+        
+        /**
+         * 一覧表示
+         */
+        public function index() 
+        {
+            $this->load->model('member_model');//モデルの読み込み
+            $data['members'] = $this->member_model->findAll();//モデルのメソッドからの返り値を代入
 
-        public function index() {
-                $this->load->model('member_model');//モデルの読み込み
-                $data['members'] = $this->member_model->findAll();//モデルのメソッドからの返り値を代入
-
-                $this->load->view('member/index', $data);//viewに$dataを渡す。
-            }
+            $this->load->view('member/index', $data);//viewに$dataを渡す。
+        }
         
         
         
-        
-        public function add() {
+        /**
+         * 新規登録
+         */
+        public function add() 
+        {
             $this->load->library('form_validation');//バリデーションの読み込み
 
             $this->form_validation->set_rules('first_name', '氏', 'required');//各種バリデーションの設定(空文字はfalse)
@@ -42,19 +51,14 @@
                     $this->index();//indexメソッドを実行
                 }
         }    
-           
-        
-        
-        public function update($id) {
-            $this->load->model('member_model');//モデルを読み込み
-            
-            $data['member'] = $this->member_model->findById($id);//パラメータと同じIDを持つmemberをdbより取得
-            $this->load->view('member/edit', $data);//member情報を持たせ、edit.phpを表示
-        }
-        
-        
-        
-        public function edit() {
+          
+
+        /**
+         * 更新処理
+         * @param type $id
+         */
+        public function edit($id) 
+        {
             $this->load->library('form_validation');//バリデーションを読み込む
             
             $this->form_validation->set_rules('first_name', '氏', 'required');//各種バリデーションの設定(空文字はfalse)
@@ -70,24 +74,29 @@
                 'home' => $this->input->post('home')//homeのvalueにinputの値を挿入
             );
 
-            $userId =$this->input->post('id');//memberを特定するidを別で取得する
+            $userId = $this->input->post('id');//memberを特定するidを別で取得する
             
             
-            if($this->form_validation->run() == FALSE) 
-            {
-                $this->update($userId);
+            if($this->form_validation->run() == FALSE) {
+                $this->load->model('member_model');//モデルを読み込み
+           
+                $data['member'] = $this->member_model->findById($id);//パラメータと同じIDを持つmemberをdbより取得
+                $this->load->view('member/edit', $data);//member情報を持たせ、edit.phpを表示
             } else {
                 $this->load->model('member_model');//モデルを読み込む
             
-                
                 $this->member_model->update($updateMember, $userId);//member_modelのupdateメソッドで$updateMemberと$userIdを用いデータベースを上書きする。
                 $this->index();//終了後indexアクションを実行させる。
             }  
         }
         
         
-        
-        public function delete($id){//削除するidをパラメータより取得
+        /**
+         * 削除処理
+         * @param type $id
+         */
+        public function delete($id)//削除するidをパラメータより取得
+        {
             $this->load->model('member_model');//モデルを読み込む
             
             $this->member_model->destroy($id);//member_modelのdeleteメソッドを実行する
