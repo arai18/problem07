@@ -7,7 +7,6 @@
         <h1>社員情報登録</h1>
         
         <?php echo validation_errors(); ?>
-        <?php echo base_url();?>
         
         <form action="/member/add" method="post">
             <label>氏</label>
