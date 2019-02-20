@@ -8,7 +8,7 @@
         
         <?php echo validation_errors();?>
         
-        <form action="<?php echo base_url("member/edit/{$member->id}");?>" method="post">
+        <form action="/member/edit/<?php echo $member->id; ?>" method="post">
             <input type="hidden" name="id" value="<?php echo $member->id;?>">
             <label>氏</label>
             <input type="text" name="first_name" value="<?php echo set_value('first_name', $member->first_name) ;?>"><br />

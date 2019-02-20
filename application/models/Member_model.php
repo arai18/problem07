@@ -28,7 +28,7 @@ class Member_model extends CI_Model{
      * @param type $id
      * @return type
      */
-    public function findById(int $id) 
+    public function findById($id) 
     {
         $query = 'select * from members where id = ?';
         return $this->db->query($query, $id)->row();//dbよりmembersテーブルからidが一致するものを返す
@@ -42,8 +42,8 @@ class Member_model extends CI_Model{
      */
     public function update($data, $userId) 
     {
-        $this->db->where('id', $userId);//idを検索して該当情報を取得する
-        $this->db->update('members', $data);//membersテーブルの上記ID該当情報を上書きする
+        $query = 'update members set first_name = ?, last_name = ?, age = ?, home = ? where id = ?';
+        $this->db->query($query, [$data['first_name'], $data['last_name'], $data['age'], $data['home'], $userId]);//idを検索して該当情報を取得し、更新処理する。
     }
     
     
@@ -53,9 +53,8 @@ class Member_model extends CI_Model{
      */
     public function destroy($id) 
     {
-        $query = 'delete ';
-        $this->db->where('id', $id);//該当するidを持つmemberを検索する
-        $this->db->delete('members');//membersテーブル内で上記IDのmemberを削除する
+        $query = 'delete from members where id = ?';
+        $this->db->query($query, $id);//該当するidを持つmemberを検索し、削除する。
     }
     
     
