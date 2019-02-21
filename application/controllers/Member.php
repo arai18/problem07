@@ -1,12 +1,17 @@
 <?php
     class Member extends CI_Controller {
         
+        /**
+         * ログインセッションの判定
+         */
         public function __construct() 
         {
             parent::__construct(); 
             
             if ($_SESSION['login'] === true) {
-            
+                header('Location: /member/index');//ログイン成功時、/member/indexに飛ばす
+            } else {
+                header('Location: /user/login');//ログイン失敗時、/user/loginに飛ばす
             }
         }
         

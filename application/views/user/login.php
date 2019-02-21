@@ -5,19 +5,17 @@
     </head>
     <body>
         
-        <h1>ユーザ登録画面</h1>
+        <h1>ログイン画面</h1>
         
-        <form action="http://local.problem07.com/user/create" method="post">
+        <form action="/user/login" method="post">
             <label>メールアドレス</label>
             <input type="text" name="email"><br />
             
             <label>パスワード</label>
             <input type="password" name="password"><br />
             
-            <label>氏名</label>
-            <input type="text" name="name"><br />
-            
-            <input type="submit" value="登録"><br />
+            <input type="submit" value="ログイン"><br />
+            <a href="/user/add">新規登録</a>
         </form>
     </body>
 </html>
