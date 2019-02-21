@@ -7,11 +7,10 @@
         public function __construct() 
         {
             parent::__construct(); 
-            
             if ($_SESSION['login'] === true) {
-                header('Location: /member/index');//ログイン成功時、/member/indexに飛ばす
+                redirect('/member/index');//ログイン成功時、/member/indexに飛ばす
             } else {
-                header('Location: /user/login');//ログイン失敗時、/user/loginに飛ばす
+                redirect('/user/login');//ログイン失敗時、/user/loginに飛ばす
             }
         }
         
@@ -30,7 +29,6 @@
          */
         public function add() 
         {
-            $this->load->library('form_validation');//バリデーションの読み込み
             $this->form_validation->set_rules('first_name', '氏', 'required');//各種バリデーションの設定(空文字はfalse)
             $this->form_validation->set_rules('last_name', '名', 'required');
             $this->form_validation->set_rules('age', '年齢', 'required');
@@ -59,15 +57,12 @@
          */
         public function edit($id) 
         {
-            $this->load->library('form_validation');//バリデーションを読み込む
             $this->form_validation->set_rules('first_name', '氏', 'required');//各種バリデーションの設定(空文字はfalse)
             $this->form_validation->set_rules('last_name', '名', 'required');
             $this->form_validation->set_rules('age', '年齢', 'required');
             $this->form_validation->set_rules('home', '出身地', 'required');
          
-            if ($this->form_validation->run() == FALSE) {
-                $this->load->model('member_model');//モデルを読み込み
-           
+            if ($this->form_validation->run() == FALSE) {          
                 $data['member'] = $this->member_model->findById($id);//パラメータと同じIDを持つmemberをdbより取得
                 $this->load->view('member/edit', $data);//member情報を持たせ、edit.phpを表示
             } else {
@@ -80,7 +75,6 @@
                 ];
                 $userId = $this->input->post('id');//memberを特定するidを別で取得する
                 
-                $this->load->model('member_model');//モデルを読み込む
                 $this->member_model->update($updateMember, $userId);//member_modelのupdateメソッドで$updateMemberと$userIdを用いデータベースを上書きする。
                 header('Location: /member/index');//headerメソッドでindexページへリダイレクト
             }  
@@ -92,7 +86,6 @@
          */
         public function delete($id)//削除するidをパラメータより取得
         {
-            $this->load->model('member_model');//モデルを読み込む
             $this->member_model->destroy($id);//member_modelのdeleteメソッドを実行する
             header('Location: /member/index');//headerメソッドでindexページへリダイレクト
         }

@@ -15,7 +15,7 @@
             <label>名</label>
             <input type="text" name="last_name" value="<?php echo set_value('last_name'); ?>"><br />
             
-            <label>年齢</label>
+            <label>生年月日</label>
             <input type="text" name="age" value="<?php echo set_value('age'); ?>"><br />
             
             <label>出身地</label>
