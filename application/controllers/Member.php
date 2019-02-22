@@ -7,10 +7,13 @@
         public function __construct() 
         {
             parent::__construct(); 
+            session_start();
+//            var_dump($_SESSION['login']);
 //            if ($_SESSION['login'] === true) {
-//                redirect('/member/index');//ログイン成功時、/member/indexに飛ばす
+//                redirect('member/index');//ログイン成功時、/member/indexに飛ばす
 //            } else {
-//                redirect('/user/login');//ログイン失敗時、/user/loginに飛ばす
+//                redirect('user/login');//ログイン失敗時、/user/loginに飛ばす
+//                exit();
 //            }
         }
         
@@ -55,7 +58,7 @@
          */
         public function edit($id) 
         {
-            if (is_int($id) && $id >= 1) {
+            if (preg_match("/^([1-9][0-9]*|1)$/", intval($id))) {//$idが1以上の整数か正規表現で判別する。
                 $this->form_validation->set_rules('first_name', '氏', 'required');//各種バリデーションの設定(空文字はfalse)
                 $this->form_validation->set_rules('last_name', '名', 'required');
                 $this->form_validation->set_rules('age', '生年月日', 'required|regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');
@@ -76,7 +79,7 @@
                     redirect('member/index');//headerメソッドでindexページへリダイレクト
                 }  
             } else {
-                redirect('member/index');
+                redirect('/member/index');
             }
         }
          
@@ -84,9 +87,13 @@
          * 削除処理
          * @param type $id
          */
-        public function delete(int $id)//削除するidをパラメータより取得
+        public function delete($id)//削除するidをパラメータより取得
         {
+            if (preg_match("/^([1-9][0-9]*|1)$/", intval($id))) {//$idが1以上の整数か正規表現で判別する。
                 $this->member_model->destroy($id);//member_modelのdeleteメソッドを実行する
-                redirect('/member/index');//headerメソッドでindexページへリダイレクト
+                redirect('member/index');//redirectメソッドでindexページへリダイレクト 
+            } else {
+                redirect('member/index');
+            }
         }
-}
+    }

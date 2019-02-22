@@ -9,6 +9,13 @@
         
         <?php echo validation_errors();?>
         
+        <?php 
+            $csrf = array(
+                'name' => $this->security->get_csrf_token_name(),
+                'hash' => $this->security->get_csrf_hash()
+            );
+        ?>
+        
         <form action="/user/add" method="post">
             <label>メールアドレス</label>
             <input type="text" name="email" value="<?php echo set_value('email'); ?>"><br />
@@ -18,7 +25,7 @@
             
             <label>氏名</label>
             <input type="text" name="name" value="<?php echo set_value('name'); ?>"><br />
-            
+            <input type="hidden" name="<?=$csrf['name'];?>" value="<?=$csrf['hash'];?>" />
             <input type="submit" value="登録"><br />
         </form>
     </body>

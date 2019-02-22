@@ -24,7 +24,7 @@
                 session_start();//セッションを発行する。
                 $_SESSION['login'] = true;
                 
-                rediret('/member/index');
+                rediret('member/index');
             }
         }
         
@@ -35,7 +35,7 @@
             $this->form_validation->set_rules('password', 'パスワード', 'required');
             
             if ($this->form_validation->run() == FALSE) {
-                $this->load->view('user/login');//バリデーションに引っかかった場合にviewを返す
+                redirect('user/login');//バリデーションに引っかかった場合にredirectを返す。
             } else {
                 $data['email'] = $this->input->post('email');//ログインフォームへ入力したemail
                 $data['password'] = sha1($this->input->post('password'));//ログインフォームへ入力したpassword
@@ -45,9 +45,9 @@
                 if (!empty($cheakUser) && count($cheakUser) === 1) {
                     session_start();//セッションを発行する。
                     $_SESSION['login'] = true;
-                    redirect('/member/index');
+                    redirect('member/index');
                 } else {
-                    redirect('/user/login');
+                    redirect('user/login');
                 }
             }
         }
