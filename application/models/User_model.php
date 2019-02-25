@@ -7,11 +7,13 @@
          */
         public function create(array $data) 
         {
-            $created = 'select created from members where email = ?';
-            $salt = $this->db->query($created, $data['email']);
-            $query = 'insert into users(email, password, name) values(?, ?, ?)';
-            $this->db->query($query, [$data['email'], sha1($data['password'] . $salt), $data['name']]);
-            $this->db->query($query, [$data['email'], $data['password'], $data['name']]);
+            $query = 'insert into users(email, name) values(?, ?)';//password以外をinsert
+            $this->db->query($query, [$data['email'], $data['name']]);
+            $usersCreated = 'select created from users where email = ?';//ユニークなemailからcreatedを検索して取得する。
+            $created = $this->db->query($usersCreated, $data['email'])->row();
+            
+            $insertPassword = 'update users set password = ? where email = ?';//ハッシュ化したpasswordをupdateで挿入する。
+            $this->db->query($insertPassword, [sha1($data['password'] . $created->created), $data['email']]);   
         }
         
         public function cheakUser(array $data)

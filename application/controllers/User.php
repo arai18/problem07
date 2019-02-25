@@ -6,7 +6,7 @@
          */
         public function add() 
         {
-            $this->form_validation->set_rules('email', 'メールアドレス', 'required');//各種バリデーションの設定(空文字はfalse)
+            $this->form_validation->set_rules('email', 'メールアドレス', 'required|is_unique[users.email]');//各種バリデーションの設定(空文字はfalse)
             $this->form_validation->set_rules('password', 'パスワード', 'required');
             $this->form_validation->set_rules('name', '氏名', 'required');
            
@@ -20,11 +20,13 @@
                 ];
                 
                 $this->user_model->create($user);//データベースへinsertする
-               
-                session_start();//セッションを発行する。
-                $_SESSION['login'] = true;
                 
-                rediret('member/index');
+                if ($this->session->userdata('login')) {
+                    $this->session->unset_userdata('login');
+                }
+                $this->session->set_userdata('login', true);
+                redirect('member/index');
+                
             }
         }
         
@@ -41,14 +43,7 @@
                 $data['password'] = sha1($this->input->post('password'));//ログインフォームへ入力したpassword
                 
                 $cheakUser = $this->user_model->cheakUser($data);//データベースから該当するemailとpasswordを検索し、発見時の返り値を$cheakUserに代入する
-                
-                if (!empty($cheakUser) && count($cheakUser) === 1) {
-                    session_start();//セッションを発行する。
-                    $_SESSION['login'] = true;
-                    redirect('member/index');
-                } else {
-                    redirect('user/login');
-                }
+ 
             }
         }
     }

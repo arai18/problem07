@@ -7,14 +7,11 @@
         public function __construct() 
         {
             parent::__construct(); 
-            session_start();
-//            var_dump($_SESSION['login']);
-//            if ($_SESSION['login'] === true) {
-//                redirect('member/index');//ログイン成功時、/member/indexに飛ばす
-//            } else {
-//                redirect('user/login');//ログイン失敗時、/user/loginに飛ばす
-//                exit();
-//            }
+            if ($this->session->userdata('login') === true) {
+                redirect('member/index');
+            } else {
+                redirect('user/index');
+            }
         }
         
         /**
@@ -22,7 +19,6 @@
          */
         public function index() 
         {
-            $this->load->model('member_model');//モデルの読み込み
             $data['members'] = $this->member_model->findAll();//モデルのメソッドからの返り値を代入
             $this->load->view('member/index', $data);//viewに$dataを渡す。
         }
@@ -40,7 +36,6 @@
             if ($this->form_validation->run() == FALSE) {
                 $this->load->view('member/add');//空文字の場合、もう一度入力を促す。
             } else {//成功時には、dbへの登録を行う。
-                $this->load->model('member_model');//モデルの読み込み
                 $member = [
                     'first_name' => $this->input->post('first_name'),//first_nameの値受け取り
                     'last_name' => $this->input->post('last_name'),//last_nameの値受け取り
@@ -48,7 +43,7 @@
                     'home' => $this->input->post('home')//homeの値受け取り
                 ];
                 $this->member_model->create($member);//member_modelのcreateメソッドを実行
-                redirect('/member/index');//headerメソッドでindexページへリダイレクト
+                redirect('member/index');//headerメソッドでindexページへリダイレクト
             }
         }    
 
@@ -79,7 +74,7 @@
                     redirect('member/index');//headerメソッドでindexページへリダイレクト
                 }  
             } else {
-                redirect('/member/index');
+                redirect('member/index');
             }
         }
          
