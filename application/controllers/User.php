@@ -18,14 +18,11 @@
                     'password' => $this->input->post('password'),
                     'name' => $this->input->post('name')
                 ];
-                
                 $this->user_model->create($user);//データベースへinsertする
-                
-//                if ($this->session->userdata('login')) {
-//                    $this->session->unset_userdata('login');
-//                }
-                $this->session->set_userdata('login', true);
-                redirect('member/index');
+                $this->session->set_userdata('login', true);//sessionを持たせる。
+                $data['csrf_token_name'] = $this->security->get_csrf_token_name();
+                $data['csrf_token_hash'] = $this->security->get_csrf_hash();
+                redirect('member/index', $data); 
                 
             }
         }
@@ -43,8 +40,13 @@
                 $data['password'] = sha1($this->input->post('password'));//ログインフォームへ入力したpassword
                 
                 $cheakUser = $this->user_model->cheakUser($data);//データベースから該当するemailとpasswordを検索し、発見時の返り値を$cheakUserに代入する
- 
             }
+        }
+        
+        public function logout()
+        {
+            $this->session->unset_userdata('login');
+            redirect('user/login');
         }
     }
        

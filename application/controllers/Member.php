@@ -8,10 +8,16 @@
         {
             parent::__construct(); 
             if ($this->session->userdata('login') !== true) {//$_SESSION['login']にtrueがなかった場合。trueであればスルー。
-                $this->load->view('user/registration');
+                $this->load->view('user/registration');//sessionがない場合はuser/registrationにリダイレクトする。
             } 
         }
         
+        private function argumentCheck($id)
+        {
+            !is_numeric($id) || intval($id) < 1;
+        }
+
+
         /**
          * 一覧表示
          */
@@ -51,7 +57,9 @@
          */
         public function edit($id) 
         {
-            if (preg_match("/^([1-9][0-9]*|1)$/", intval($id))) {//$idが1以上の整数か正規表現で判別する。
+            if ($this->argumentCheck($id)) {//$idが1以上の整数か正規表現で判別する。
+                redirect('user/logout');
+            } else {
                 $this->form_validation->set_rules('first_name', '氏', 'required');//各種バリデーションの設定(空文字はfalse)
                 $this->form_validation->set_rules('last_name', '名', 'required');
                 $this->form_validation->set_rules('age', '生年月日', 'required|regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');
@@ -70,9 +78,7 @@
                     $userId = $this->input->post('id');//memberを特定するidを別で取得する
                     $this->member_model->update($updateMember, $userId);//member_modelのupdateメソッドで$updateMemberと$userIdを用いデータベースを上書きする。
                     redirect('member/index');//headerメソッドでindexページへリダイレクト
-                }  
-            } else {
-                redirect('member/index');
+                }
             }
         }
          
@@ -82,11 +88,11 @@
          */
         public function delete($id)//削除するidをパラメータより取得
         {
-            if (preg_match("/^([1-9][0-9]*|1)$/", intval($id))) {//$idが1以上の整数か正規表現で判別する。
-                $this->member_model->destroy($id);//member_modelのdeleteメソッドを実行する
-                redirect('member/index');//redirectメソッドでindexページへリダイレクト 
+            if ($this->argumentCheck($id)) {//$idが整数ではなく、マイナスである場合の条件分岐
+                redirect('user/logout');
             } else {
-                redirect('member/index');
+                $this->member_model->destroy($id);//member_modelのdeleteメソッドを実行する
+                redirect('member/index');//redirectメソッドでindexページへリダイレクト
             }
         }
     }
