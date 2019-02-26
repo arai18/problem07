@@ -8,31 +8,21 @@
         
         <?php echo validation_errors();?>
         
-        <?php 
-            $csrf = array(
-                'name' => $this->security->get_csrf_token_name(),
-                'hash' => $this->security->get_csrf_hash()
-            );
-        ?>
-        
-        <form action="/member/edit/<?php echo $member->id; ?>" method="post">
-            <input type="hidden" name="id" value="<?php echo $member->id;?>">
-            <label>氏</label>
-            <input type="text" name="first_name" value="<?php echo set_value('first_name', $member->first_name) ;?>"><br />
+        <?php echo form_open("/member/edit/{$member->id}"); ?>
+            <?php echo form_hidden('id', "{$member->id}"); ?>
             
-            <label>名</label>
-            <input type="text" name="last_name" value="<?php echo set_value('last_name', $member->last_name) ;?>"><br />
+            <?php echo form_label('氏'); ?>
+            <?php echo form_input('first_name', set_value('first_name', $member->first_name)); ?><br />
             
-            <label>生年月日</label>
-            <input type="text" name="age" value="<?php echo set_value('age', $member->age) ;?>"><br />
+            <?php echo form_label('名'); ?>
+            <?php echo form_input('last_name', set_value('last_name', $member->last_name)); ?><br />
             
-            <label>出身地</label>
-            <input type="text" name="home" value="<?php echo set_value('home', $member->home) ;?>"><br />
-            <input type="hidden" name="<?=$csrf['name'];?>" value="<?=$csrf['hash'];?>" />
-            <input type="submit" value="登録">
+            <?php echo form_label('生年月日'); ?>
+            <?php echo form_input('age', set_value('age', $member->age)); ?><br />
             
-        </form>
-        
-       
+            <?php echo form_label('出身地'); ?>
+            <?php echo form_input('home', set_value('home', $member->home)); ?><br />
+            <?php echo form_submit('submit', '登録'); ?>
+        <?php echo form_close();?>
     </body>
 </html>

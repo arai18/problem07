@@ -9,24 +9,16 @@
         
         <?php echo validation_errors();?>
         
-        <?php 
-            $csrf = array(
-                'name' => $this->security->get_csrf_token_name(),
-                'hash' => $this->security->get_csrf_hash()
-            );
-        ?>
-        
-        <form action="/user/add" method="post">
-            <label>メールアドレス</label>
-            <input type="text" name="email" value="<?php echo set_value('email'); ?>"><br />
+        <?php echo form_open('/user/add'); ?>
+            <?php echo form_label('メールアドレス'); ?>
+            <?php echo form_input('email', set_value('email')); ?><br />
             
-            <label>パスワード</label>
-            <input type="password" name="password" value="<?php echo set_value('password'); ?>"><br />
+            <?php echo form_label('パスワード'); ?>
+            <?php echo form_password('password', set_value('password')); ?><br />
             
-            <label>氏名</label>
-            <input type="text" name="name" value="<?php echo set_value('name'); ?>"><br />
-            <input type="hidden" name="<?=$csrf['name'];?>" value="<?=$csrf['hash'];?>" />
-            <input type="submit" value="登録"><br />
-        </form>
+            <?php echo form_label('氏名'); ?>
+            <?php echo form_input('name', set_value('name')); ?><br />
+            <?php echo form_submit('submit', '登録'); ?>
+        <?php echo form_close(); ?>
     </body>
 </html>

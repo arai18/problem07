@@ -7,16 +7,16 @@
         
         <h1>ログイン画面</h1>
         
-        <form action="/user/login" method="post">
-            <label>メールアドレス</label>
-            <input type="text" name="email" value="<?php echo set_value('email'); ?>"><br />
+        <?php echo form_open('/user/login'); ?>
+        
+            <?php echo form_label('メールアドレス'); ?>
+            <?php echo form_input('email', set_value('email')); ?><br />
             
-            <label>パスワード</label>
-            <input type="password" name="password"><br />
+            <?php echo form_label('パンワード'); ?>
+            <?php echo form_password('password', set_value('password')); ?><br />
             
-            <input type="submit" value="ログイン"><br />
-            <input type="hidden" name="<?=$csrf['name'];?>" value="<?=$csrf['hash'];?>" />
+            <?php echo form_submit('submit', 'ログイン'); ?><br />
             <a href="/user/add">新規登録</a>
-        </form>
+        <?php echo form_close(); ?>
     </body>
 </html>

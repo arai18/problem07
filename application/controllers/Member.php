@@ -6,15 +6,16 @@
          */
         public function __construct() 
         {
-            parent::__construct(); 
+            parent::__construct();
             if ($this->session->userdata('login') !== true) {//$_SESSION['login']にtrueがなかった場合。trueであればスルー。
-                $this->load->view('user/registration');//sessionがない場合はuser/registrationにリダイレクトする。
-            } 
+                $this->session->unset_userdata('login');//true以外の場合は削除する。
+                redirect('user/add');//sessionにtrueがない場合はuser/registrationにリダイレクトする。
+            }
         }
         
-        private function argumentCheck($id)
+        private function argumentCheck($id)//if文の条件を共通化
         {
-            !is_numeric($id) || intval($id) < 1;
+            return !is_numeric($id) || intval($id) < 1;//returnしないと正常に動かない。
         }
 
 
