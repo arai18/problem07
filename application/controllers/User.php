@@ -21,9 +21,9 @@
                 
                 $this->user_model->create($user);//データベースへinsertする
                 
-                if ($this->session->userdata('login')) {
-                    $this->session->unset_userdata('login');
-                }
+//                if ($this->session->userdata('login')) {
+//                    $this->session->unset_userdata('login');
+//                }
                 $this->session->set_userdata('login', true);
                 redirect('member/index');
                 

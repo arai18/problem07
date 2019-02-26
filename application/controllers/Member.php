@@ -7,11 +7,9 @@
         public function __construct() 
         {
             parent::__construct(); 
-            if ($this->session->userdata('login') === true) {
-                redirect('member/index');
-            } else {
-                redirect('user/index');
-            }
+            if ($this->session->userdata('login') !== true) {//$_SESSION['login']にtrueがなかった場合。trueであればスルー。
+                $this->load->view('user/registration');
+            } 
         }
         
         /**
