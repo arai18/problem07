@@ -6,6 +6,7 @@
     <body>
         
         <h1>ログイン画面</h1>
+        <?php echo validation_errors();?>
         
         <?php echo form_open('/user/login'); ?>
         
