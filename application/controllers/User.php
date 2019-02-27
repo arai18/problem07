@@ -11,7 +11,7 @@
             $this->form_validation->set_rules('name', '氏名', 'required');
             
             if ($this->form_validation->run() == FALSE) {
-                $this->load->view('user/registration');//バリデーションに引っかかった場合にviewを返す
+                $this->load->view('user/add');//バリデーションに引っかかった場合にviewを返す
             } else {
                 $user = [
                     'email' => $this->input->post('email'),//usersテーブルに新規登録する情報
@@ -38,8 +38,8 @@
             } else {
                 $data['email'] = $this->input->post('email');//ログインフォームへ入力したemail
                 $data['password'] = $this->input->post('password');//ログインフォームへ入力したpassword
-                $cheakUser = $this->user_model->cheakUser($data);//passwordが合致するuserデータをdbから取得する。
-                if ($cheakUser) {//userが存在するかチェックする。
+                $getUser = $this->user_model->findUser($data);//passwordが合致するuserデータをdbから取得する。
+                if ($getUser->password === sha1($data['password'] . $getUser->created)) {//userが存在するかチェックする。
                     $this->session->set_userdata('login', true);//userがある場合はsessionをセットしてmember/indexへリダイレクト
                     redirect('member/index');
                 } else {

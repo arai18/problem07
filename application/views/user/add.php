@@ -20,5 +20,6 @@
             <?php echo form_input('name', set_value('name')); ?><br />
             <?php echo form_submit('submit', '登録'); ?>
         <?php echo form_close(); ?>
+            <a href="/user/login">ログイン</a>
     </body>
 </html>

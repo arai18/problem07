@@ -5,6 +5,7 @@
     </head>
     <body>
         <h1>社員情報更新</h1>
+        <h3><a href="/user/logout">ログアウト</a></h3>
         
         <?php echo validation_errors();?>
         

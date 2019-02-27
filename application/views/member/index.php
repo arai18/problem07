@@ -9,6 +9,7 @@
     <h1>社員一覧画面</h1>
     
     <h2><a href="/member/add">新規登録</a></h2>
+    <h3><a href="/user/logout">ログアウト</a></h3>
     
     <table border="1">
         <tr>
@@ -24,7 +25,7 @@
         <?php foreach($members as $member): ?>
         <tr>
             <td><?= $member->id ?></td>
-            <td><a href="/member/edit/<?php echo $member->id; ?>"><?= $member->first_name . $member->last_name  ?></a></td>
+            <td><a href="/member/edit/<?php echo $member->id; ?>"><?= $member->first_name . $member->last_name  ?></a>(<?php echo (date("Ymd") - $member->age) / 10000 ; ?>)</td>
             <td><?= $member->home ?></td>
             <td><a href="/member/comment/<?php echo $member->id;?>">コメント</a></td>
             <td><a href="/member/delete/<?php echo $member->id; ?>" class="delete">削除</a></td>
