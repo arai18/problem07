@@ -78,7 +78,7 @@ $db['default'] = array(
 	'hostname' => 'localhost',
 	'username' => 'kadai07',
 	'password' => 'HDs@s;;=04d',
-	'database' => 'problem07',
+	'database' => 'problem08',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

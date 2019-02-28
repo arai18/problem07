@@ -39,7 +39,7 @@
                 $data['email'] = $this->input->post('email');//ログインフォームへ入力したemail
                 $data['password'] = $this->input->post('password');//ログインフォームへ入力したpassword
                 $getUser = $this->user_model->findUser($data);//passwordが合致するuserデータをdbから取得する。
-                if ($getUser->password === sha1($data['password'] . $getUser->created)) {//userが存在するかチェックする。
+                if ($getUser->password === sha1($data['password'] . $getUser->created)) {//user.passwordを比較する。
                     $this->session->set_userdata('login', true);//userがある場合はsessionをセットしてmember/indexへリダイレクト
                     redirect('member/index');
                 } else {
