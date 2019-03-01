@@ -18,8 +18,23 @@ class Member_model extends CI_Model{
      */
     public function create(array $data)
     {
-        $query = 'insert into members(first_name, last_name, age, home) values(?, ?, ?, ?);';
-        $this->db->query($query, [$data['first_name'], $data['last_name'], $data['age'], $data['home']]);//$queryのクエリ文の変数に値を挿入する。（プリペアドステートメント）
+        $query = 'insert into members(first_name, last_name, first_name_kana, last_name_kana, gender, birthday, address, entering_company_date, retirement_date, division_id, position, email, password, emergency_contact_address) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $this->db->query($query, [//$queryのクエリ文の変数に値を挿入する。（プリペアドステートメント）
+            $data['first_name'], 
+            $data['last_name'], 
+            $data['first_name_kana'], 
+            $data['last_name_kana'],
+            $data['gender'], 
+            $data['birthday'],
+            $data['address'], 
+            $data['entering_company_date'],
+            $data['retirement_date'], 
+            $data['division_id'],
+            $data['position'],
+            $data['email'],
+            $data['password'],
+            $data['emergency_contact_address']
+            ]);
     }
     
     

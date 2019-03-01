@@ -17,7 +17,7 @@
             ],
             'member_id' => [//社員ID
                 'type' => 'INT',
-                'unsigned' => TRUE,
+                'unsigned' => TRUE
             ],
             'first_name' => [//氏
                 'type' => 'VARCHAR',
