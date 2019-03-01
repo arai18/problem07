@@ -7,10 +7,10 @@
         public function __construct() 
         {
             parent::__construct();
-            if ($this->session->userdata('login') !== true) {//$_SESSION['login']にtrueがなかった場合。trueであればスルー。
-                $this->session->unset_userdata('login');//true以外の場合は削除する。
-                redirect('user/add');//sessionにtrueがない場合はuser/registrationにリダイレクトする。
-            }
+//            if ($this->session->userdata('login') !== true) {//$_SESSION['login']にtrueがなかった場合。trueであればスルー。
+//                $this->session->unset_userdata('login');//true以外の場合は削除する。
+//                redirect('user/add');//sessionにtrueがない場合はuser/registrationにリダイレクトする。
+//            }
         }
         
         private function argumentCheck($id)//if文の条件を共通化
@@ -35,17 +35,37 @@
         {
             $this->form_validation->set_rules('first_name', '氏', 'required');//各種バリデーションの設定(空文字はfalse)
             $this->form_validation->set_rules('last_name', '名', 'required');
-            $this->form_validation->set_rules('age', '生年月日', 'required|regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');
-            $this->form_validation->set_rules('home', '出身地', 'required');
-
+            $this->form_validation->set_rules('first_name_kana', '氏(カナ)', 'required|regex_match[/^[ァ-ヶー]+$/u]');//全角カナ入力
+            $this->form_validation->set_rules('last_name_kana', '名(カナ)', 'required|regex_match[/^[ァ-ヶー]+$/u]');//全角カナ入力
+            $this->form_validation->set_rules('gender', '性別', 'required');
+            $this->form_validation->set_rules('birthday', '生年月日', 'required|regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');
+            $this->form_validation->set_rules('address', '住所', 'required');
+            $this->form_validation->set_rules('entering_company_date', '入社日', 'requiredregex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');//存在、日付のvalidation。
+            $this->form_validation->set_rules('retirement_date', '退職日', 'regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');//日付のvalidation
+            $this->form_validation->set_rules('division_id', '部署ID', 'required');
+            $this->form_validation->set_rules('position', '役職ID', 'required');
+            $this->form_validation->set_rules('email', 'メールアドレス', 'required|is_unique[members.email]');//メールアドレスのvalidation
+            $this->form_validation->set_rules('password', 'パスワード', 'required');
+            $this->form_validation->set_rules('emergency_contact_address', '緊急連絡先電話番号', 'required|regex_match[/^(0{1}\d{9,10})$/]');//ハイフンなしの電話番号で制限するvalidation
+            
             if ($this->form_validation->run() == FALSE) {
                 $this->load->view('member/add');//空文字の場合、もう一度入力を促す。
             } else {//成功時には、dbへの登録を行う。
                 $member = [
                     'first_name' => $this->input->post('first_name'),//first_nameの値受け取り
                     'last_name' => $this->input->post('last_name'),//last_nameの値受け取り
-                    'age' => $this->input->post('age'),//ageの値受け取り
-                    'home' => $this->input->post('home')//homeの値受け取り
+                    'first_name_kana' => $this->input->post('first_name_kana'),//first_name_kanaの値受け取り
+                    'last_name_kana' => $this->input->post('last_name_kana'),//last_name_kanaの値受け取り
+                    'gender' => $this->input->post('gender'),//genderの値受け取り
+                    'birthday' => $this->input->post('birthday'),//birthdayの値受け取り
+                    'address' => $this->input->post('address'),//addressの値受け取り
+                    'entering_company_date' => $this->input->post('entering_company_date'),//entering_company_dateの値受け取り
+                    'retirement_date' => $this->input->post('retirement_date'),//retirement_dateの値受け取り
+                    'division_id' => $this->input->post('division_id'),//division_idの値受け取り
+                    'position' => $this->input->post('position'),//positionの値受け取り
+                    'email' => $this->input->post('email'),//emailの値受け取り
+                    'password' => $this->input->post('password'),//passwordの値受け取り
+                    'emergency_contact_address' => $this->input->post('emergency_contact_address')//emergency_contact_addressの値受け取り
                 ];
                 $this->member_model->create($member);//member_modelのcreateメソッドを実行
                 redirect('member/index');//headerメソッドでindexページへリダイレクト
