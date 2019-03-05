@@ -31,8 +31,7 @@
             <td><a href="/member/delete/<?php echo $member->id; ?>" class="delete">削除</a></td>
             <td><?= $member->created ?></td>
             <td><?= $member->modified ?></td>
-        </tr>
-        
+        </tr> 
         <?php endforeach; ?>
     </table>
     

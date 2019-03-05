@@ -1,4 +1,5 @@
 <?php
+    defined('BASEPATH') OR exit('No direct script access allowed');
     class Member extends CI_Controller {
         
         /**
@@ -40,7 +41,7 @@
             $this->form_validation->set_rules('gender', '性別', 'required');
             $this->form_validation->set_rules('birthday', '生年月日', 'required|regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');
             $this->form_validation->set_rules('address', '住所', 'required');
-            $this->form_validation->set_rules('entering_company_date', '入社日', 'requiredregex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');//存在、日付のvalidation。
+            $this->form_validation->set_rules('entering_company_date', '入社日', 'required|regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');//存在、日付のvalidation。
             $this->form_validation->set_rules('retirement_date', '退職日', 'regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');//日付のvalidation
             $this->form_validation->set_rules('division_id', '部署ID', 'required');
             $this->form_validation->set_rules('position', '役職ID', 'required');
@@ -68,7 +69,7 @@
                     'emergency_contact_address' => $this->input->post('emergency_contact_address')//emergency_contact_addressの値受け取り
                 ];
                 $this->member_model->create($member);//member_modelのcreateメソッドを実行
-                redirect('member/index');//headerメソッドでindexページへリダイレクト
+                redirect('member/index');//headerメソッドでtarget/indexへリダイレクト
             }
         }    
 
@@ -86,7 +87,7 @@
                 $this->form_validation->set_rules('age', '生年月日', 'required|regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');
                 $this->form_validation->set_rules('home', '出身地', 'required');//ここまででvalidationはあるもののviewへは飛ばしていないため、次のvalidationdで引っかかる。
          
-                if ($this->form_validation->run() == FALSE) {          
+                if ($this->form_validation->run() === FALSE) {          
                     $data['member'] = $this->member_model->findById($id);//パラメータと同じIDを持つmemberをdbより取得
                     $this->load->view('member/edit', $data);//member情報を持たせ、edit.phpを表示
                 } else {
@@ -98,7 +99,7 @@
                     ];
                     $userId = $this->input->post('id');//memberを特定するidを別で取得する
                     $this->member_model->update($updateMember, $userId);//member_modelのupdateメソッドで$updateMemberと$userIdを用いデータベースを上書きする。
-                    redirect('member/index');//headerメソッドでindexページへリダイレクト
+                    redirect('member/index');//redirectrメソッドでindexページへリダイレクト
                 }
             }
         }
