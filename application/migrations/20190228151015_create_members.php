@@ -67,7 +67,8 @@
             ],
             'password' => [//パスワード
                 'type' => 'VARCHAR',
-                'constraint' => '100'
+                'constraint' => '100',
+                'null' => TRUE
             ],
             'emergency_contact_address' => [//緊急連絡先電話番号
                 'type' => 'VARCHAR',
