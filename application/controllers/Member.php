@@ -8,7 +8,10 @@
         public function __construct() 
         {
             parent::__construct();
-            
+            if (!$this->session->userdata('admin_id')) {
+                $this->session->unset_userdata('admin_id');
+                redirect('admin/login');
+            }
         }
         
         /**
@@ -141,7 +144,14 @@
                 }
             }  
         }
-
+        
+        /**
+         * 社員情報一覧表示機能
+         */
+        public function index()
+        {
+            $this->load->view('member/index');
+        }
 
         /**
          * 削除処理
