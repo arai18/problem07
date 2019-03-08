@@ -2,12 +2,16 @@
 <html lang="ja">
 <head>
     <title>目標一覧</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> 
+    <script type="text/javascript" src="/assets/js/script.js"></script>
 </head>
 <body>
+    <a href="/member/edit/<?php echo $this->session->userdata('member_id'); ?>">メンバー情報編集</a>
+    <a href="/member/logout">ログアウト</a>
+    
     <h1>目標一覧</h1>
     
     <h2><a href="/target/add">目標追加</a></h2>
-    <h3><a href="/member/logout">ログアウト</a></h3>
      
     <h4><?php echo 2022; ?>年度</h4>
         <table border="1">
@@ -24,14 +28,14 @@
 
             <?php $number = 0;?>
             <?php foreach ($targets as $target): ?>
-                <?php if($target->year == 2020): ?>
+                <?php if($target->year == 2022): ?>
                 <?php $number++; ?>
                 <tr>
                     <td><?php echo $number; ?></td>
                     <td><?php echo $target->term; ?></td>
                     <td><?php echo $target->target?></td>
                     <td><a href="/target/edit/<?php echo $target->member_id ?>/<?php echo $target->year?>/<?php echo $target->term?>">編集</a></td>
-                    <td><a href="/target/delete/<?php echo $target->member_id?>/<?php echo $target->year?>/<?php echo $target->term?>">削除</a></td>
+                    <td><a href="/target/delete/<?php echo $target->member_id?>/<?php echo $target->year?>/<?php echo $target->term?>" class="delete">削除</a></td>
                     <td><a href="#">コメント</a></td>
                     <td><?php echo $target->created; ?></td>
                     <td><?php echo $target->modified; ?></td>
@@ -63,7 +67,7 @@
                     <td><?php echo $target->term; ?></td>
                     <td><?php echo $target->target?></td>
                     <td><a href="/target/edit/<?php echo $target->member_id ?>/<?php echo $target->year?>/<?php echo $target->term?>">編集</a></td>
-                    <td><a href="/target/delete/<?php echo $target->member_id?>/<?php echo $target->year?>/<?php echo $target->term?>">削除</a></td>
+                    <td><a href="/target/delete/<?php echo $target->member_id?>/<?php echo $target->year?>/<?php echo $target->term?>" class="delete">削除</a></td>
                     <td><a href="#">コメント</a></td>
                     <td><?php echo $target->created; ?></td>
                     <td><?php echo $target->modified; ?></td>
@@ -95,7 +99,7 @@
                     <td><?php echo $target->term; ?></td>
                     <td><?php echo $target->target?></td>
                     <td><a href="/target/edit/<?php echo $target->member_id ?>/<?php echo $target->year?>/<?php echo $target->term?>">編集</a></td>
-                    <td><a href="/target/delete/<?php echo $target->member_id?>/<?php echo $target->year?>/<?php echo $target->term?>">削除</a></td>
+                    <td><a href="/target/delete/<?php echo $target->member_id?>/<?php echo $target->year?>/<?php echo $target->term?>" class="delete">削除</a></td>
                     <td><a href="#">コメント</a></td>
                     <td><?php echo $target->created; ?></td>
                     <td><?php echo $target->modified; ?></td>
@@ -126,7 +130,7 @@
                     <td><?php echo $target->term; ?></td>
                     <td><?php echo $target->target?></td>
                     <td><a href="/target/edit/<?php echo $target->member_id ?>/<?php echo $target->year?>/<?php echo $target->term?>">編集</a></td>
-                    <td><a href="/target/delete/<?php echo $target->member_id?>/<?php echo $target->year?>/<?php echo $target->term?>">削除</a></td>
+                    <td><a href="/target/delete/<?php echo $target->member_id?>/<?php echo $target->year?>/<?php echo $target->term?>" class="delete">削除</a></td>
                     <td><a href="#">コメント</a></td>
                     <td><?php echo $target->created; ?></td>
                     <td><?php echo $target->modified; ?></td>

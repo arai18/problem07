@@ -5,10 +5,10 @@
          * データベース登録
          * @param array $data
          */
-        public function create(array $data)//targetの内容をdbへ書き込む
+        public function create(array $data, $member_id)//targetの内容をdbへ書き込む
         {
             $query = 'insert into targets(member_id, year, term, target) values(?, ?, ?, ?)';
-            $this->db->query($query,[0, $data['year'], $data['term'], $data['target']]);                    
+            $this->db->query($query,[$member_id, $data['year'], $data['term'], $data['target']]);                    
         }
         
         /**

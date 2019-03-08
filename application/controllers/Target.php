@@ -3,13 +3,22 @@
 class Target extends CI_Controller {
     
     /**
+     * session['member_id']の条件分岐
+     */
+    public function __construct() 
+    {
+        parent::__construct();
+        if (!$this->session->userdata('member_id')) {//session情報がない場合の処理
+            $this->session->unset_userdata('member_id');
+            redirect('member/add');
+        }
+    }
+
+        /**
      * 目標一覧
      */
-    public function index($member_id = 0) //$member_idにはsessionデータを入れる。
+    public function index($member_id) //$member_idにはsessionデータを入れる。
     {  
-        //member_idが同じものを取得する。
-        //年度が同じで四半期の4つを選択する。
-        //viewにそれを渡す。
         $data['targets'] = $this->target_model->findById($member_id);//member_idに対応した情報を取得
         $this->load->view("target/index", $data);//viewにデータを渡す。
     }
@@ -26,21 +35,21 @@ class Target extends CI_Controller {
         if ($this->form_validation->run() === FALSE) {//target/addにアクセスした際、formの入力がないためviewが表示できる。
             $this->load->view('target/add');
         } else {
-            $target = [
+            $target = [//targetの登録内容をviewから取得する。
                 'year' => $this->input->post('year'),
                 'term' => $this->input->post('term'),
                 'target' => $this->input->post('target')
             ];
-            $this->target_model->create($target);
-            //redirect indexページに
-            redirect('target/index');
+            $member_id = $this->session->userdata('member_id');//sessionのデータを変数$member_idに格納する。
+            $this->target_model->create($target, $member_id);//dbへtargetの内容とmember_idを登録する。
+            redirect("target/index/{$member_id}");//各ユーザのindexページへリダイレクトする。
         }
     }
     
     /**
      *  目標の編集
      */
-    public function edit($member_id = 0, $year, $term)//とりあえず$member_idに初期値0を設定。
+    public function edit($member_id, $year, $term)//とりあえず$member_idに初期値0を設定。
     {
         $this->form_validation->set_rules('year', '年度', 'required|regex_match[/^[0-9]{4}$/]');
         $this->form_validation->set_rules('term', '期間', 'required');
@@ -61,16 +70,16 @@ class Target extends CI_Controller {
                 'target' => $this->input->post('target')//inputで取得したtargetデータ
             ];
             $this->target_model->update($updateTarget, $findTarget);//dbのデータを引数で上書きする。
-            redirect('target/index');//リダイレクトさせる。
+            redirect("target/index/{$member_id}");//リダイレクトさせる。
         }
     }
     
     /**
      * 目標の削除
      */
-    public function delete($member_id = 0, $year, $term) 
+    public function delete($member_id, $year, $term) 
     {
         $this->target_model->destroy($member_id, $year, $term);
-        redirect('target/index');
+        redirect("target/index/{$member_id}");
     }
 }

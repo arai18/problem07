@@ -6,6 +6,8 @@
     <body>
         <h1>社員情報登録</h1>
         
+        <a href="/member/login">ログイン</a>
+        
         <?php echo validation_errors(); ?>
         
         <?php echo form_open('/member/add'); ?>
@@ -20,7 +22,7 @@
             <?php echo form_input('last_name_kana', set_value('last_name_kana')); ?><br />
             
             <?php echo form_label('性別'); ?>
-            <?php echo form_dropdown('gender', [ 1 => '男', 2 => '女' ], 1); ?><br />
+            <?php echo form_dropdown('gender', [ 1 => '男', 2 => '女' ], set_value('gender')); ?><br />
            
             <?php echo form_label('生年月日'); ?>
             <?php 
@@ -36,9 +38,24 @@
             <?php echo form_input('address', set_value('address')); ?><br />
             
             <?php echo form_label('入社日'); ?>
-            <?php echo form_input('entering_company_date', set_value('entering_company_date')); ?>
+            <?php
+                $entering_company_date = [
+                    'name' => 'entering_company_date',
+                    'value' => set_value('entering_company_date'),
+                    'placeholder' => '2019-01-01'
+                ];
+            ?>
+            <?php echo form_input($entering_company_date); ?>
+            
             <?php echo form_label('退職日'); ?>
-            <?php echo form_input('retirement_date', set_value('retirement_date')); ?><br />
+            <?php
+                $retirement_date = [
+                    'name' => 'retirement_date',
+                    'value' => set_value('retirement_date'),
+                    'placeholder' => '2019-01-01'
+                ];
+            ?>
+            <?php echo form_input($retirement_date); ?><br />
             
             <?php echo form_label('部署ID'); ?>
             <?php 
