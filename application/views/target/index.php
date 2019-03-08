@@ -28,7 +28,7 @@
 
             <?php $number = 0;?>
             <?php foreach ($targets as $target): ?>
-                <?php if($target->year == 2020): ?>
+                <?php if($target->year == 2022): ?>
                 <?php $number++; ?>
                 <tr>
                     <td><?php echo $number; ?></td>

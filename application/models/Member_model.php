@@ -59,6 +59,15 @@ class Member_model extends CI_Model{
         $query = 'select * from members where email = ?';
         return $this->db->query($query, $data['email'])->row();
     }
+    
+    /**
+     * emailによりmemberデータを取得する
+     */
+    public function findByPostEmail($email)
+    {
+        $query = 'select email from members where email = ?';
+        return $this->db->query($query, $email)->result();
+    }
 
     /**
      * $data(上書きする値)とidでdbを上書きする
@@ -67,7 +76,7 @@ class Member_model extends CI_Model{
      */
     public function update($data, $member_id) 
     {
-        $query = 'update members set first_name = ?, last_name = ?, first_name_kana = ?, last_name_kana = ?, gender = ?, birthday = ?, address = ?, entering_company_date = ?, retirement_date = ?, division_id = ?, position = ?, emergency_contact_address = ?  where id = ?';
+        $query = 'update members set first_name = ?, last_name = ?, first_name_kana = ?, last_name_kana = ?, gender = ?, birthday = ?, address = ?, entering_company_date = ?, retirement_date = ?, division_id = ?, position = ?, email = ?, emergency_contact_address = ?  where id = ?';
         $this->db->query($query, [
             $data['first_name'], //パスワード以外の情報をdbへ登録する。
             $data['last_name'], 
@@ -80,6 +89,7 @@ class Member_model extends CI_Model{
             $data['retirement_date'], 
             $data['division_id'],
             $data['position'],
+            $data['email'],
             $data['emergency_contact_address'],
             $member_id
             ]);//idを検索して該当情報を取得し、更新処理する。

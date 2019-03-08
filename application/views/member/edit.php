@@ -73,6 +73,9 @@
             ?>
             <?php echo form_dropdown('position', $position_options, set_value('position', $member->position)); ?><br />
             
+            <?php echo form_label('メールアドレス'); ?>
+            <?php echo form_input('email', set_value('email', $member->email)); ?><br />
+            
             <?php echo form_label('緊急連絡先電話番号'); ?>
             <?php 
                 $emergency_contact_address = [

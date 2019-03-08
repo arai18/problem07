@@ -93,8 +93,7 @@
                 $this->form_validation->set_rules('retirement_date', '退職日', 'regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');//日付のvalidation
                 $this->form_validation->set_rules('division_id', '部署ID', 'required');
                 $this->form_validation->set_rules('position', '役職ID', 'required');
-//                $this->form_validation->set_rules('email', 'メールアドレス', 'required');//メールアドレスのvalidation
-//                $this->form_validation->set_rules('password', 'パスワード', 'required');
+                $this->form_validation->set_rules('email', 'メールアドレス', 'required|callback_email_check');//メールアドレスのvalidation
                 $this->form_validation->set_rules('emergency_contact_address', '緊急連絡先電話番号', 'required|regex_match[/^(0{1}\d{9,10})$/]');//ハイフンなしの電話番号で制限するvalidation
                 
                 if ($this->form_validation->run() === FALSE) {          
@@ -113,12 +112,10 @@
                         'retirement_date' => $this->input->post('retirement_date'),//retirement_dateの値受け取り
                         'division_id' => $this->input->post('division_id'),//division_idの値受け取り
                         'position' => $this->input->post('position'),//positionの値受け取り
-//                        'email' => $this->input->post('email'),//emailの値受け取り
-//                        'password' => $this->input->post('password'),//passwordの値受け取り
+                        'email' => $this->input->post('email'),//emailの値受け取る
                         'emergency_contact_address' => $this->input->post('emergency_contact_address')//emergency_contact_addressの値受け取り
                     ];
                     $this->member_model->update($updateMember, $member_id);//member_modelのupdateメソッドで$updateMemberと$userIdを用いデータベースを上書きする。
-//                    $memberId = $this->session->userdata('member_id');
                     redirect("target/index/{$member_id}");//redirectrメソッドでindexページへリダイレクト
                 }
             }
@@ -169,5 +166,21 @@
         {
             $this->session->unset_userdata('member_id');//sessionを削除する
             redirect('member/login');//loginページへリダイレクト
+        }
+        
+        /**
+         * callback処理(email)
+         */
+        public function email_check($email)
+        {
+            $id = $this->session->userdata('member_id');//sessionからmember_idを取得して変数$idに代入
+            $getMemberBySession = $this->member_model->findById($id);//$idを用いてpost前のemailを取得する。(row();)
+            $checkEmailCount = $this->member_model->findByPostEmail($email);//$emailを用いてpost時のemailからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
+            //post前のemailとpost時のemailを比較 && $checkEmailCountの返り値が1つの場合(post前のemailのみ) || post前とpost時のemailが異なる && $checkEmailCountの返り値が空の場合(DBに重複emailがない)
+            if ($getMemberBySession->email === $email && count($checkEmailCount) === 1 || $getMemberBySession->email !== $email && empty($checkEmailCount)) {
+                return TRUE;
+            } else {
+                return FALSE;
+            }
         }
     }
