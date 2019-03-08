@@ -6,7 +6,8 @@
     <script type="text/javascript" src="/assets/js/script.js"></script>
 </head>
 <body>
-    <a href="/member/edit/<?php echo $this->session->userdata('member_id'); ?>">メンバー情報編集</a>
+    <a href="/member/edit/<?php echo $this->session->userdata('member_id'); ?>">メンバー情報変更</a>
+    <a href="/member/edit_password/<?php echo $this->session->userdata('member_id'); ?>">パスワード変更</a>
     <a href="/member/logout">ログアウト</a>
     
     <h1>目標一覧</h1>

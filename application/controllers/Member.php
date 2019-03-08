@@ -120,7 +120,29 @@
                 }
             }
         }
-         
+        
+        /**
+         * passwordの更新処理
+         */
+        public function edit_password($member_id)
+        {
+            if ($this->argumentCheck($member_id)) {//$idが1以上の整数か正規表現で判別する。
+                redirect('member/logout');
+            } else {
+                $this->form_validation->set_rules('old_password', '現在のパスワード', 'required|callback_old_password_check');//現在のパスワードが一致しているか確認する。
+                $this->form_validation->set_rules('new_password', '新しいパスワード', 'required|callback_new_password_check');//現在のパスワードと新規のパスワードが一致していないか確認する。
+            
+                if ($this->form_validation->run() === FALSE) {
+                    $this->load->view("member/edit_password");//validationにかかった際にviewへ戻す
+                } else {
+                    $updatePassword = $this->input->post('new_password');//新規パスワードをpostで受け取る
+                    $this->member_model->updatePassword($updatePassword, $member_id);//dbへ新規パスワードをupdateする
+                    redirect("target/index/{$member_id}");//target/indexにリダイレクトする
+                }
+            }  
+        }
+
+
         /**
          * 削除処理
          * @param type $id
@@ -169,7 +191,8 @@
         }
         
         /**
-         * callback処理(email)
+         * callback処理
+         * emailのvalidation設定
          */
         public function email_check($email)
         {
@@ -178,6 +201,36 @@
             $checkEmailCount = $this->member_model->findByPostEmail($email);//$emailを用いてpost時のemailからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
             //post前のemailとpost時のemailを比較 && $checkEmailCountの返り値が1つの場合(post前のemailのみ) || post前とpost時のemailが異なる && $checkEmailCountの返り値が空の場合(DBに重複emailがない)
             if ($getMemberBySession->email === $email && count($checkEmailCount) === 1 || $getMemberBySession->email !== $email && empty($checkEmailCount)) {
+                return TRUE;
+            } else {
+                return FALSE;
+            }
+        }
+        
+        /**
+         * old_passwordのvalidation設定
+         */
+        public function old_password_check($password)
+        {
+            $id = $this->session->userdata('member_id');//sessionからmember_idを取得する
+            $getMemberBySession = $this->member_model->findById($id);//$idからmemberデータを取得する
+            $hashedOldPassword = sha1($password . $getMemberBySession->created);//post時のpasswordでハッシュ化
+            if ($hashedOldPassword === $getMemberBySession->password) {//post前とpost時のpasswordを比較する
+                return TRUE;
+            } else {
+                return FALSE;
+            }
+        }
+
+        /**
+         * new_passwordのvalidation設定
+         */
+        public function new_password_check($password)
+        {
+            $id = $this->session->userdata('member_id');//sessionからmember_idを取得する
+            $getMemberBySession = $this->member_model->findById($id);//$idからmemberデータを取得する
+            $hashedNewPassword = sha1($password . $getMemberBySession->created);//post時のpasswordでハッシュ化
+            if ($hashedNewPassword !== $getMemberBySession->password) {//post前とpost時のpasswordを比較する
                 return TRUE;
             } else {
                 return FALSE;

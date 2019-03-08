@@ -68,6 +68,10 @@ class Member_model extends CI_Model{
         $query = 'select email from members where email = ?';
         return $this->db->query($query, $email)->result();
     }
+    
+    /*
+     * 
+     */
 
     /**
      * $data(上書きする値)とidでdbを上書きする
@@ -95,7 +99,18 @@ class Member_model extends CI_Model{
             ]);//idを検索して該当情報を取得し、更新処理する。
     }
     
+    /**
+     * passwordのupdate処理
+     */
+    public function updatePassword($password, $member_id)
+    {
+        $query = 'update members set password = ? where id = ?';
+        $getMember = $this->member_model->findById($member_id);
+        $this->db->query($query, [sha1($password . $getMember->created), $member_id]);
+    }
+
     
+
     /**
      * 該当するidを持つmemberを削除する
      * @param type $id
