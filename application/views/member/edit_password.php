@@ -8,7 +8,7 @@
         
         <?php echo validation_errors(); ?>
         
-        <?php echo form_open("member/edit_password/{$this->session->userdata('member_id')}"); ?>
+        <?php echo form_open("member/edit_password"); ?>
             <?php echo form_label('現在のパスワード'); ?>
             <?php echo form_password('old_password', set_value('old_password')); ?>
         

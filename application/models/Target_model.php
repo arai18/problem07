@@ -1,6 +1,6 @@
 <?php
     class Target_model extends CI_Model {
-        
+    
         /**
          * データベース登録
          * @param array $data

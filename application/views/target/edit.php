@@ -11,7 +11,7 @@
     
     <?php echo validation_errors(); ?>
     
-    <?php echo form_open("/target/edit/{$target->member_id}/{$target->year}/{$target->term}"); ?>
+    <?php echo form_open("/target/edit/{$target->year}/{$target->term}"); ?>
         <?php echo form_label('年度'); ?>
         <?php
             $year = [

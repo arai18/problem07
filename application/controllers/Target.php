@@ -17,10 +17,11 @@ class Target extends CI_Controller {
         /**
      * 目標一覧
      */
-    public function index($member_id) //$member_idにはsessionデータを入れる。
+    public function index() //$member_idにはsessionデータを入れる。
     {  
-        $data['targets'] = $this->target_model->findById($member_id);//member_idに対応した情報を取得
-        $this->load->view("target/index", $data);//viewにデータを渡す。
+        $member_id = $this->session->userdata('member_id');
+        $data['targets'] = $this->Target_model->findById($member_id);//member_idに対応した情報を取得
+        $this->load->view('target/index', $data);//viewにデータを渡す。
     }
     
     /**
@@ -41,24 +42,26 @@ class Target extends CI_Controller {
                 'target' => $this->input->post('target')
             ];
             $member_id = $this->session->userdata('member_id');//sessionのデータを変数$member_idに格納する。
-            $this->target_model->create($target, $member_id);//dbへtargetの内容とmember_idを登録する。
-            redirect("target/index/{$member_id}");//各ユーザのindexページへリダイレクトする。
+            $this->Target_model->create($target, $member_id);//dbへtargetの内容とmember_idを登録する。
+            redirect("target/index");//各ユーザのindexページへリダイレクトする。
         }
     }
     
     /**
      *  目標の編集
      */
-    public function edit($member_id, $year, $term)//とりあえず$member_idに初期値0を設定。
+    public function edit($year, $term)//とりあえず$member_idに初期値0を設定。
     {
         $this->form_validation->set_rules('year', '年度', 'required|regex_match[/^[0-9]{4}$/]');
         $this->form_validation->set_rules('term', '期間', 'required');
         $this->form_validation->set_rules('target', '目標', 'required');
         
         if ($this->form_validation->run() === FALSE) {
-            $data['target'] = $this->target_model->findByTarget($member_id, $year, $term);//編集するtargetの既存データを取得する。
+            $member_id = $this->session->userdata('member_id');
+            $data['target'] = $this->Target_model->findByTarget($member_id, $year, $term);//編集するtargetの既存データを取得する。
             $this->load->view("target/edit", $data);//既存データをeditページに反映する。
         } else {
+            $member_id = $this->session->userdata('member_id');
             $findTarget = [//target特定用データ
                 'member_id' => $member_id,
                 'year' => $year,
@@ -69,17 +72,18 @@ class Target extends CI_Controller {
                 'term' => $this->input->post('term'),//inputで取得したtermデータ
                 'target' => $this->input->post('target')//inputで取得したtargetデータ
             ];
-            $this->target_model->update($updateTarget, $findTarget);//dbのデータを引数で上書きする。
-            redirect("target/index/{$member_id}");//リダイレクトさせる。
+            $this->Target_model->update($updateTarget, $findTarget);//dbのデータを引数で上書きする。
+            redirect("target/index");//リダイレクトさせる。
         }
     }
     
     /**
      * 目標の削除
      */
-    public function delete($member_id, $year, $term) 
+    public function delete($year, $term) 
     {
-        $this->target_model->destroy($member_id, $year, $term);
-        redirect("target/index/{$member_id}");
+        $member_id = $this->session->userdata('member_id');
+        $this->Target_model->destroy($member_id, $year, $term);
+        redirect("target/index");
     }
 }

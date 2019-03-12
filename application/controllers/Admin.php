@@ -3,7 +3,7 @@
     class Admin extends CI_Controller {
         
         /**
-         * Userの新規登録とバリデーション処理
+         * 新規登録とバリデーション処理
          */
         public function add() 
         {
@@ -19,21 +19,25 @@
                     'password' => $this->input->post('password'),
                     'name' => $this->input->post('name')
                 ];
-                $this->admin_model->create($admin);//データベースへinsertする
-                $getAdmin = $this->admin_model->findByEmail($admin);//emailからadmin_idを検索す
+                $this->Admin_model->create($admin);//データベースへinsertする
+                $Admin = $this->Admin_model->findByEmail($admin);//emailからadmin_idを検索す
                 if (!$this->session->userdata('admin_id')) {//session['admin']にデータがないことを確認する
-                    $this->session->set_userdata('admin_id', $getAdmin->id);//sessionにadmin_idを持たせる
+                    $this->session->set_userdata('admin_id', $Admin->id);//sessionにadmin_idを持たせる
                     redirect('member/index');//redirectメソッドでmember/indexへリダイレクトさせる。
                 } else {//sessionデータがある場合は削除して再発行する処理
                     $this->session->unset_userdata('admin_id');
-                    $this->session->set_userdata('admin_id', $getAdmin->id);//sessionにmember.idを持たせる      
+                    $this->session->set_userdata('admin_id', $Admin->id);//sessionにmember.idを持たせる      
                     redirect('member/index');//redirectメソッドでtarget/indexへリダイレクトさせる。
                 }  
             }
         }
         
         /**
-         * Userのログイン処理
+         * 
+         */
+        
+        /**
+         * ログイン処理
          */
         public function login() 
         {
@@ -47,9 +51,9 @@
                     'email' => $this->input->post('email'),//ログインフォームへ入力したemail
                     'password' => $this->input->post('password')//ログインフォームへ入力したpassword
                 ];                
-                $getAdmin = $this->admin_model->findByEmail($login);//passwordが合致するuserデータをdbから取得する。
-                if ($getAdmin->password === sha1($login['password'] . $getAdmin->created)) {//user.passwordを比較する
-                    $this->session->set_userdata('admin_id', $getAdmin->id);//userがある場合はsessionをセットしてmember/indexへリダイレクト
+                $Admin = $this->Admin_model->findByEmail($login);//passwordが合致するuserデータをdbから取得する。
+                if ($Admin->password === sha1($login['password'] . $Admin->created)) {//user.passwordを比較する
+                    $this->session->set_userdata('admin_id', $Admin->id);//userがある場合はsessionをセットしてmember/indexへリダイレクト
                     redirect('member/index');
                 } else {
                     redirect('admin/login');//userがない場合はuser/loginへリダイレクト
