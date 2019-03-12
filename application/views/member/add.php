@@ -60,20 +60,20 @@
             <?php echo form_label('部署ID'); ?>
             <?php 
                 $division_options = [
-                    0 => '0 : 開発部',
-                    1 => '1 : 総務部'
+                    1 => '1 : 開発部',
+                    2 => '2 : 総務部'
                 ]; 
             ?>
-            <?php echo form_dropdown('division_id', $division_options, 0); ?>
+            <?php echo form_dropdown('division_id', $division_options, set_value('division_id')); ?>
             
             <?php echo form_label('役職ID'); ?>
             <?php 
                 $position_options = [
-                    0 => '0 : 社員',
-                    1 => '1 : 部長'
+                    1 => '1 : 社員',
+                    2 => '2 : 部長'
                 ];
             ?>
-            <?php echo form_dropdown('position', $position_options, 0); ?><br />
+            <?php echo form_dropdown('position', $position_options, set_value('position')); ?><br />
             
             <?php echo form_label('メールアドレス'); ?>
             <?php echo form_input('email', set_value('email')); ?><br />

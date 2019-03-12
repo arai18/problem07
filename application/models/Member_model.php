@@ -45,7 +45,7 @@ class Member_model extends CI_Model{
      * @param type $id
      * @return type
      */
-    public function findById($id) 
+    public function findById(int $id) 
     {
         $query = 'select * from members where id = ?';
         return $this->db->query($query, $id)->row();//dbよりmembersテーブルからidが一致するものを返す
@@ -54,16 +54,16 @@ class Member_model extends CI_Model{
     /**
      * emailによりmemberデータを取得する
      */
-    public function findByEmail(array $data)
+    public function findByEmail(string $email)
     {
         $query = 'select * from members where email = ?';
-        return $this->db->query($query, $data['email'])->row();
+        return $this->db->query($query, $email)->row();
     }
     
     /**
      * emailによりmemberデータを取得する
      */
-    public function findByPostEmail($email)
+    public function findByPostEmail(string $email)
     {
         $query = 'select email from members where email = ?';
         return $this->db->query($query, $email)->result();
@@ -105,7 +105,7 @@ class Member_model extends CI_Model{
     public function updatePassword($password, $member_id)
     {
         $query = 'update members set password = ? where id = ?';
-        $getMember = $this->member_model->findById($member_id);
+        $getMember = $this->Member_model->findById($member_id);
         $this->db->query($query, [sha1($password . $getMember->created), $member_id]);
     }
 

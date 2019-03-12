@@ -8,7 +8,7 @@
         
         <?php echo validation_errors(); ?>
         
-        <?php echo form_open("/member/edit/{$member->id}"); ?>
+        <?php echo form_open("/member/edit"); ?>
             <?php echo form_label('氏'); ?>
             <?php echo form_input('first_name', set_value('first_name', $member->first_name)); ?>
             <?php echo form_label('名'); ?>
