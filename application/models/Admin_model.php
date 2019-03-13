@@ -18,10 +18,11 @@
         /**
          * emailによってadminデータを取得する
          */
-        public function findByEmail(array $data)
+        public function findByEmail(string $email)
         {
             $query = 'select * from admin where email = ?';
-            return $this->db->query($query, $data['email'])->row();
+            $admin = $this->db->query($query, $email)->row();
+            return $admin;
         }
 
         
