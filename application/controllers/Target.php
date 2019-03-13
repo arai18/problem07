@@ -13,15 +13,25 @@ class Target extends CI_Controller {
             redirect('member/add');
         }
     }
+    
+    /**
+     * viewを表示する処理
+     */
+    private function showView($subView, $subData = '')//content部分のviewを受け取る。viewに渡すdataも引数で受け取る
+    {
+        $content = $this->load->view($subView, $subData, true);//htmlを文字列にしたcontent(view)を変数に代入する
+        $data['content'] = $content;//layout(view)に渡せるように$dataに代入する
+        $this->load->view('layout/member/layout', $data);//layout/layout.phpを表示させる
+    }
 
-        /**
+    /**
      * 目標一覧
      */
     public function index() //$member_idにはsessionデータを入れる。
     {  
         $member_id = $this->session->userdata('member_id');
         $data['targets'] = $this->Target_model->findById($member_id);//member_idに対応した情報を取得
-        $this->load->view('target/index', $data);//viewにデータを渡す。
+        $this->showView('target/index', $data);
     }
     
     /**
@@ -34,7 +44,7 @@ class Target extends CI_Controller {
         $this->form_validation->set_rules('target', '目標', 'required');
         
         if ($this->form_validation->run() === FALSE) {//target/addにアクセスした際、formの入力がないためviewが表示できる。
-            $this->load->view('target/add');
+            $this->showView('target/add');//viewを返す
         } else {
             $target = [//targetの登録内容をviewから取得する。
                 'year' => $this->input->post('year'),
@@ -59,7 +69,7 @@ class Target extends CI_Controller {
         if ($this->form_validation->run() === FALSE) {
             $member_id = $this->session->userdata('member_id');
             $data['target'] = $this->Target_model->findByTarget($member_id, $year, $term);//編集するtargetの既存データを取得する。
-            $this->load->view("target/edit", $data);//既存データをeditページに反映する。
+            $this->showView('target/edit', $data);//$data['target']を引数にviewを返す。
         } else {
             $member_id = $this->session->userdata('member_id');
             $findTarget = [//target特定用データ
@@ -73,7 +83,7 @@ class Target extends CI_Controller {
                 'target' => $this->input->post('target')//inputで取得したtargetデータ
             ];
             $this->Target_model->update($updateTarget, $findTarget);//dbのデータを引数で上書きする。
-            redirect("target/index");//リダイレクトさせる。
+            redirect('target/index');//リダイレクトさせる。
         }
     }
     

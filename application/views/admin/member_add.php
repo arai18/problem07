@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>社員情報登録</title>
+        <title>社員管理システム</title>
     </head>
     <body>
         <h1>社員情報登録</h1>
         
-        <a href="/member/login">ログイン</a>
-        
         <?php echo validation_errors(); ?>
         
-        <?php echo form_open('/member/add'); ?>
+        <?php echo form_open('/admin/member_add'); ?>
             <?php echo form_label('氏'); ?>
             <?php echo form_input('first_name', set_value('first_name')); ?>
             <?php echo form_label('名'); ?>

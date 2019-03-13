@@ -45,7 +45,7 @@ class Member_model extends CI_Model{
      * @param type $id
      * @return type
      */
-    public function findById(int $id) 
+    public function findById($id) //整数値のみ受け付けるように処理するよう変更をする。
     {
         $query = 'select * from members where id = ?';
         return $this->db->query($query, $id)->row();//dbよりmembersテーブルからidが一致するものを返す
