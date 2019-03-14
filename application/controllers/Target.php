@@ -9,8 +9,7 @@ class Target extends CI_Controller {
     {
         parent::__construct();
         if (!$this->session->userdata('member_id')) {//session情報がない場合の処理
-            $this->session->unset_userdata('member_id');
-            redirect('member/add');
+            redirect('member/logout');
         }
     }
     
@@ -30,6 +29,7 @@ class Target extends CI_Controller {
     public function index() //$member_idにはsessionデータを入れる。
     {  
         $member_id = $this->session->userdata('member_id');
+        $data['years'] = $this->Target_model->distinctYear($member_id);//重複しないyearを連想配列で取得する
         $data['targets'] = $this->Target_model->findById($member_id);//member_idに対応した情報を取得
         $this->showView('target/index', $data);
     }

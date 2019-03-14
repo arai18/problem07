@@ -18,7 +18,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     'password' => $this->input->post('password')//ログインフォームへ入力したpassword
                 ];                
                 $admin = $this->Admin_model->findByEmail($login['email']);//passwordが合致するuserデータをdbから取得する。
-                if ($admin->password === sha1($login['password'] . $admin->created)) {//user.passwordを比較する
+                if ($admin->password === $this->utility->getHash($login['password'] . $admin->created)) {//user.passwordを比較する
                     $this->session->set_userdata('admin_id', $admin->id);//userがある場合はsessionをセットしてmember/indexへリダイレクト
                     redirect('admin/member_index');
                 } else {
@@ -38,10 +38,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             if ($this->form_validation->run() === FALSE) {
                 $this->load->view('login/member');
             } else {
-                $data['email'] = $this->input->post('email');
-                $data['password'] = $this->input->post('password');
-                $member = $this->Member_model->findByEmail($data['email']);//emailでmember情報を取得する。
-                if ($member->password === sha1($data['password'] . $member->created)) {
+                $login = [
+                    'email' => $this->input->post('email'),
+                    'password' => $this->input->post('password')
+                ];
+                $member = $this->Member_model->findByEmail($login['email']);//emailでmember情報を取得する。
+                if ($member->password === $this->utility->getHash($login['password'], $member->created)) {
                     $this->session->set_userdata('member_id', $member->id);//sessionを持たせる
                     redirect('target/index');//各ユーザのindexページへリダイレクトする。
                 } else {
