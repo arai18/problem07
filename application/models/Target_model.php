@@ -23,6 +23,16 @@
         }
         
         /**
+         * 重複無しのyearを取得する
+         */
+        public function distinctYear($id)
+        {
+            $query = 'select distinct year from targets where member_id = ? order by year desc';//重複しないyearを昇順で取得する
+            return $this->db->query($query, $id)->result();
+        }
+
+
+        /**
          * $member_id、$year、$termで検索しtargetを取得する。
          */
         public function findByTarget($member_id, $year, $term)//該当のtargetを取得する。

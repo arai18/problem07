@@ -37,7 +37,7 @@ class Member_model extends CI_Model{
         $memberCreated = 'select created from members where email = ?';//email検索し、createdを取得する
         $created = $this->db->query($memberCreated, $data['email'])->row();
         $insertPassword = 'update members set password = ? where email = ?';
-        $this->db->query($insertPassword, [sha1($data['password'] . $created->created), $data['email']]);
+        $this->db->query($insertPassword, [$this->utility->getHash($data['password'], $created->created), $data['email']]);
     }
      
     /**
@@ -54,7 +54,7 @@ class Member_model extends CI_Model{
     /**
      * emailによりmemberデータを取得する
      */
-    public function findByEmail(string $email)
+    public function findByEmail($email)
     {
         $query = 'select * from members where email = ?';
         return $this->db->query($query, $email)->row();
@@ -68,10 +68,6 @@ class Member_model extends CI_Model{
         $query = 'select email from members where email = ?';
         return $this->db->query($query, $email)->result();
     }
-    
-    /*
-     * 
-     */
 
     /**
      * $data(上書きする値)とidでdbを上書きする
@@ -106,10 +102,8 @@ class Member_model extends CI_Model{
     {
         $query = 'update members set password = ? where id = ?';
         $getMember = $this->Member_model->findById($member_id);
-        $this->db->query($query, [sha1($password . $getMember->created), $member_id]);
+        $this->db->query($query, [$this->utility->getHash($password, $getMember->created), $member_id]);
     }
-
-    
 
     /**
      * 該当するidを持つmemberを削除する

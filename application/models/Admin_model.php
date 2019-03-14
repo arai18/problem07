@@ -12,19 +12,33 @@
             $selectQuery = 'select * from admin where email = ?';//ユニークなemailからcreatedを検索して取得する。
             $getAdmin = $this->db->query($selectQuery, $data['email'])->row();
             $insertPassword = 'update admin set password = ? where email = ?';//ハッシュ化したpasswordをupdateで挿入する。
-            $this->db->query($insertPassword, [sha1($data['password'] . $getAdmin->created), $data['email']]);   
+            $this->db->query($insertPassword, [$this->utility->getHash($data['password'], $getAdmin->created), $data['email']]);   
         }
         
         /**
-         * emailによってadminデータを取得する
+         * idからadmin情報を取得する
          */
-        public function findByEmail(string $email)
+        public function findById($id)
         {
-            $query = 'select * from admin where email = ?';
-            $admin = $this->db->query($query, $email)->row();
-            return $admin;
+            $query = 'select * from admin where id = ?';
+            return $this->db->query($query, $id)->row();
         }
 
+        /**
+         * emailによってadminデータを取得する
+         */
+        public function findByEmail($email)
+        {
+            $query = 'select * from admin where email = ?';
+            return $this->db->query($query, $email)->row();
+        }
         
-    
+        /**
+         * 更新処理
+         */
+        public function update(array $data, $id)
+        {
+            $query = 'update admin set email = ?, name = ? where id = ?';
+            $this->db->query($query, [$data['email'], $data['name'], $id]);
+        }
     }

@@ -6,7 +6,7 @@
         <h1>ログイン画面</h1>
         <?php echo validation_errors();?>
         
-        <?php echo form_open('/member/login'); ?>
+        <?php echo form_open('/login/member'); ?>
         
             <?php echo form_label('メールアドレス'); ?>
             <?php echo form_input('email', set_value('email')); ?><br />

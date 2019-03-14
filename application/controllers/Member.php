@@ -24,15 +24,6 @@
             $this->load->view('layout/member/layout', $data);
         }
 
-                /**
-         * 引数に整数のみ受け付ける条件
-         */
-        private function argumentCheck($member_id)//if文の条件を共通化
-        {
-            return !is_numeric($member_id) || intval($member_id) < 1;//returnしないと正常に動かない。
-        }
-           
-
         /**
          * 更新処理
          * @param type $id
@@ -73,6 +64,7 @@
                     'email' => $this->input->post('email'),//emailの値受け取る
                     'emergency_contact_address' => $this->input->post('emergency_contact_address')//emergency_contact_addressの値受け取り
                 ];
+                $member_id = $this->session->userdata('member_id');
                 $this->Member_model->update($updatedMember, $member_id);//member_modelのupdateメソッドで$updateMemberと$userIdを用いデータベースを上書きする。
                 redirect('target/index');//redirectrメソッドでindexページへリダイレクト
             }
@@ -93,20 +85,6 @@
                 $updatedPassword = $this->input->post('new_password');//新規パスワードをpostで受け取る
                 $this->Member_model->updatePassword($updatedPassword, $member_id);//dbへ新規パスワードをupdateする
                 redirect("target/index");//target/indexにリダイレクトする
-            }
-        }
-
-        /**
-         * 削除処理
-         * @param type $id
-         */
-        public function delete($id)//削除するidをパラメータより取得
-        {
-            if ($this->argumentCheck($id)) {//$idが整数ではなく、マイナスである場合の条件分岐
-                redirect('user/logout');
-            } else {
-                $this->Member_model->destroy($id);//Member_modelのdeleteメソッドを実行する
-                redirect('member/index');//redirectメソッドでindexページへリダイレクト
             }
         }
         
@@ -143,7 +121,7 @@
         {
             $id = $this->session->userdata('member_id');//sessionからmember_idを取得する
             $memberBySession = $this->Member_model->findById($id);//$idからmemberデータを取得する
-            $hashedOldPassword = sha1($password . $memberBySession->created);//post時のpasswordでハッシュ化
+            $hashedOldPassword = $this->utility->getHash($password, $memberBySession->created);//post時のpasswordでハッシュ化
             if ($hashedOldPassword === $memberBySession->password) {//post前とpost時のpasswordを比較する
                 return TRUE;
             } else {
@@ -158,7 +136,7 @@
         {
             $id = $this->session->userdata('member_id');//sessionからmember_idを取得する
             $memberBySession = $this->Member_model->findById($id);//$idからmemberデータを取得する
-            $hashedNewPassword = sha1($password . $memberBySession->created);//post時のpasswordでハッシュ化
+            $hashedNewPassword = $this->utility->getHash($password, $memberBySession->created);//post時のpasswordでハッシュ化
             if ($hashedNewPassword !== $memberBySession->password) {//post前とpost時のpasswordを比較する
                 return TRUE;
             } else {

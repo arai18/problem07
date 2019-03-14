@@ -11,6 +11,7 @@
         <th>入社日</th>
         <th>目標</th>
         <th>コメント</th>
+        <th>編集</th>
         <th>削除</th>
         <th>登録日時</th>
         <th>更新日時</th>
@@ -32,6 +33,7 @@
             <th><?php echo $member->entering_company_date;?></th>
             <th><a href="/target/index">一覧</a></th>
             <th><a href="#">コメント</a></th>
+            <th><a href="/admin/member_edit/<?php echo $member->id; ?>">編集</a></th>
             <th><a href="#">削除</a></th>
             <th>
                 <?php
