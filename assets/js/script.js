@@ -1,5 +1,5 @@
 $(function() {
     $('.delete').click(function(){
-        alert('削除');
+        alert('本当に削除しますか？');
     });
 });

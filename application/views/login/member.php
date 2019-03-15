@@ -2,7 +2,9 @@
 <html lang="ja">
     <head>
         <title>社員管理システム</title>
-    </head>
+    </head>    
+        <?php echo $this->session->flashdata('flash_message'); ?>
+    
         <h1>ログイン画面</h1>
         <?php echo validation_errors();?>
         

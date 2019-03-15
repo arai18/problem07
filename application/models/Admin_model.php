@@ -23,7 +23,16 @@
             $query = 'select * from admin where id = ?';
             return $this->db->query($query, $id)->row();
         }
-
+        
+        /**
+         * emailで検索しresult()で取得する
+         */
+        public function findResultByEmail($email)
+        {
+            $query = 'select * from admin where email = ?';
+            return $this->db->query($query, $email)->result();
+        }
+        
         /**
          * emailによってadminデータを取得する
          */

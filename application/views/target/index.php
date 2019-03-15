@@ -1,8 +1,10 @@
+<?php echo $this->session->flashdata('flash_message');?>
+
 <h1>目標一覧</h1>
 <h2><a href="/target/add">目標追加</a></h2>
 
     <?php foreach ($years as $year): ?>
-    <h3><?php echo $year->year; ?></h3>
+    <h3><?php echo $year->year; ?>年度</h3>
         <table border="1">
             <tr>
                 <th>No</th>
@@ -40,7 +42,7 @@
                     </td>
                     <td><?php echo $target->target;?></td>
                     <td><a href="/target/edit/<?php echo $target->year?>/<?php echo $target->term?>">編集</a></td>
-                    <td><a href="/target/delete/<?php echo $target->year?>/<?php echo $target->term?>">削除</a></td>
+                    <td><a href="/target/delete/<?php echo $target->year?>/<?php echo $target->term?>" class="delete">削除</a></td>
                     <td><a href="#">コメント</a></td>
                     <td>
                         <?php

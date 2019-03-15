@@ -30,6 +30,7 @@
          */
         public function edit()//sessionを用いるため引数にmember_idは含めない
         {
+            //validation設定
             $this->form_validation->set_rules('first_name', '氏', 'required');//各種バリデーションの設定(空文字はfalse)
             $this->form_validation->set_rules('last_name', '名', 'required');
             $this->form_validation->set_rules('first_name_kana', '氏(カナ)', 'required|regex_match[/^[ァ-ヶー]+$/u]');//全角カナ入力
@@ -44,9 +45,16 @@
             $this->form_validation->set_rules('email', 'メールアドレス', 'required|callback_email_check');//メールアドレスのvalidation
             $this->form_validation->set_rules('emergency_contact_address', '緊急連絡先電話番号', 'required|regex_match[/^(0{1}\d{9,10})$/]');//ハイフンなしの電話番号で制限するvalidation
 
+            //validationメッセージ
+            $this->form_validation->set_message('required', '【{field}】が未入力です');
+            $this->form_validation->set_message('regex_match', '【{field}】の入力形式が違います');
+            $this->form_validation->set_message('email_check', 'この【{field}】は既に登録済みです');
+            
             if ($this->form_validation->run() === FALSE) {
                 $member_id = $this->session->userdata('member_id');
                 $data['member'] = $this->Member_model->findById($member_id);//member_idがsessionと同じmemberデータを取得する。
+                $data['divisions'] = $this->Division_model->findAll();//プルダウンメニュー用の部署データを取得し、$dataに渡す。
+                $data['positions'] = $this->Position_model->findAll();//プルダウンメニュー用の役職データを取得し、$dataに渡す。
                 $this->showView('member/edit', $data);//$dataでlayoutに渡し、表示させる。
             } else {
                 $updatedMember = [//上書きするデータの配列を作成
@@ -66,6 +74,7 @@
                 ];
                 $member_id = $this->session->userdata('member_id');
                 $this->Member_model->update($updatedMember, $member_id);//member_modelのupdateメソッドで$updateMemberと$userIdを用いデータベースを上書きする。
+                $this->session->set_flashdata('flash_message', '社員情報を編集しました');
                 redirect('target/index');//redirectrメソッドでindexページへリダイレクト
             }
         }
@@ -78,13 +87,19 @@
             $this->form_validation->set_rules('old_password', '現在のパスワード', 'required|callback_old_password_check');//現在のパスワードが一致しているか確認する。
             $this->form_validation->set_rules('new_password', '新しいパスワード', 'required|callback_new_password_check');//現在のパスワードと新規のパスワードが一致していないか確認する。
 
+            //validationメッセージ
+            $this->form_validation->set_message('required', '【{field}】が未入力です');
+            $this->form_validation->set_message('old_password_check', '【{field}】正しくありません');
+            $this->form_validation->set_message('new_password_check', '【{field}】が現在のパスワードと同じため変更してください。');
+            
             if ($this->form_validation->run() === FALSE) {
                 $this->showView('member/edit_password');//パスワード変更リンクも表示される。                    
             } else {
                 $member_id = $this->session->userdata('member_id');
                 $updatedPassword = $this->input->post('new_password');//新規パスワードをpostで受け取る
                 $this->Member_model->updatePassword($updatedPassword, $member_id);//dbへ新規パスワードをupdateする
-                redirect("target/index");//target/indexにリダイレクトする
+                $this->session->set_flashdata('flash_message', 'パスワードを変更しました');
+                redirect('target/index');//target/indexにリダイレクトする
             }
         }
         
@@ -94,7 +109,8 @@
         public function logout()
         {
             $this->session->unset_userdata('member_id');//sessionを削除する
-            redirect('member/login');//loginページへリダイレクト
+            $this->session->set_flashdata('logout', 'ログアウトしました');
+            redirect('login/member');//loginページへリダイレクト
         }
         
         /**

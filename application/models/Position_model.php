@@ -20,7 +20,7 @@
         }
 
         /**
-         * nameから部署名を取得する
+         * nameから役職名を取得する
          */
         public function findByName($name)
         {
@@ -38,12 +38,21 @@
         }
 
         /**
-         * 部署名の更新
+         * 役職名の更新
          */
         public function update($position, $id)
         {
             $query = 'update positions set position_name = ? where id = ?';
             $this->db->query($query, [$position['name'], $id]);
+        }
+        
+        /**
+         * 役職名の削除
+         */
+        public function destroy($id)
+        {
+            $query = 'delete from positions where id = ?';
+            $this->db->query($query, $id);
         }
     }
 

@@ -45,4 +45,13 @@ class Division_model extends CI_Model{
         $query = 'update divisions set division_name = ? where id = ?';
         $this->db->query($query, [$division['name'], $id]);
     }
+    
+    /**
+    * 部署名の削除
+    */
+    public function destroy($id)
+    {
+        $query = 'delete from divisions where id = ?';
+        $this->db->query($query, $id);
+    }
 }

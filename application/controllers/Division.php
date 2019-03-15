@@ -13,6 +13,14 @@
         }
         
         /**
+         * 引数に整数のみ受け付ける条件
+         */
+        private function argumentCheck($id)//if文の条件を共通化
+        {
+            return !is_numeric($id) || intval($id) < 1;//returnしないと正常に動かない。
+        }
+        
+        /**
          * adminのview統合表示
          */
         private function showView($subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す
@@ -29,12 +37,17 @@
         {
             $this->form_validation->set_rules('name', '部署名', 'required|is_unique[divisions.division_name]');
             
+            //validationメッセージ
+            $this->form_validation->set_message('required', '【{field}】が未入力です');
+            $this->form_validation->set_message('is_unique', 'この【{field}】は既に登録済みです');
+            
             if ($this->form_validation->run() === FALSE) {
                 $this->showView('division/add');//部署名の登録はログイン後なので、showViewを使って表示する
             } else {
                 $name = ['name' => $this->input->post('name')];//部署名nameを受け取る
                 $this->Division_model->create($name);//部署名をdbへ登録する
-                redirect('admin/member_index');//のちにdivision/index.phpに飛ばす
+                $this->session->set_flashdata('flash_message', '新しい部署名を登録しました');
+                redirect('division/index');//のちにdivision/index.phpに飛ばす
             }
         }
         
@@ -44,17 +57,25 @@
         public function edit($id)
         {
             $this->form_validation->set_rules('name', '部署名', 'required|callback_name_check');
+            //validationメッセージ
+            $this->form_validation->set_message('required', '【{field}】が未入力です');
+            $this->form_validation->set_message('name_check', 'この【{field}】は既に登録済みです');
             
-            if ($this->form_validation->run() === FALSE) {
-                $this->session->set_userdata('division_id', $id);
-                $division_id = $this->session->userdata('division_id');
-                $data['division'] = $this->Division_model->findById($division_id);
-                $this->showView('division/edit', $data);
+            if ($this->argumentCheck($id)) {
+                redirect('admin/logout');
             } else {
-                $division = ['name' => $this->input->post('name')];
-                $this->Division_model->update($division, $id);
-                redirect('division/index');
-            }
+                if ($this->form_validation->run() === FALSE) {
+                    $this->session->set_userdata('division_id', $id);
+                    $division_id = $this->session->userdata('division_id');
+                    $data['division'] = $this->Division_model->findById($division_id);
+                    $this->showView('division/edit', $data);
+                } else {
+                    $division = ['name' => $this->input->post('name')];
+                    $this->Division_model->update($division, $id);
+                    $this->session->set_flashdata('flash_message', '部署名を編集しました');
+                    redirect('division/index');
+                }
+            } 
         }
 
         /**
@@ -65,7 +86,21 @@
             $data['divisions'] = $this->Division_model->findAll();
             $this->showView('division/index', $data);
         }
-
+        
+        /**
+         * 部署名を削除
+         */
+        public function delete($id)
+        {
+           if ($this->argumentCheck($id)) {
+                redirect('admin/logout');
+           } else {
+                $this->Division_model->destroy($id); 
+                $this->session->set_flashdata('flash_message', '部署名を削除しました');
+                redirect('division/index');
+           }
+        }
+        
         /**
          * コールバック処理
          * 部署名の編集時のvalidation
