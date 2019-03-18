@@ -13,7 +13,17 @@
             }
         }
         
-         /**
+        /**
+         * admin用のview
+         */
+        private function showView($subView, $subData = '')
+        {
+            $content = $this->load->view($subView, $subData, true);
+            $data['content'] = $content;
+            $this->load->view('layout/admin/layout', $data);
+        }
+
+        /**
          * 引数に整数のみ受け付ける条件
          */
         private function argumentCheck($id)//if文の条件を共通化
@@ -26,9 +36,14 @@
          */
         public function add() 
         {
-            $this->form_validation->set_rules('email', 'メールアドレス', 'required|is_unique[admin.email]');//各種バリデーションの設定(空文字はfalse)
+            $this->form_validation->set_rules('email', 'メールアドレス', 'required|regex_match[/^[a-zA-Z0-9_.+-]+[@][a-zA-Z0-9.-]+$/]|is_unique[admin.email]');//各種バリデーションの設定(空文字はfalse)
             $this->form_validation->set_rules('password', 'パスワード', 'required');
             $this->form_validation->set_rules('name', '氏名', 'required');
+            
+            //validationメッセージ
+            $this->form_validation->set_message('required', '【{field}】が未入力です');
+            $this->form_validation->set_message('regex_match', '【{field}】の入力形式が違います');
+            $this->form_validation->set_message('is_unique', 'この【{field}】は既に登録済みです');
             
             if ($this->form_validation->run() == FALSE) {
                 $this->load->view('admin/add');//バリデーションに引っかかった場合にviewを返す
@@ -39,15 +54,10 @@
                     'name' => $this->input->post('name')
                 ];
                 $this->Admin_model->create($admin);//データベースへinsertする
-                $admin = $this->Admin_model->findByEmail($admin['email']);//emailからadmin_idを検索す
-                if (!$this->session->userdata('admin_id')) {//session['admin']にデータがないことを確認する
-                    $this->session->set_userdata('admin_id', $admin->id);//sessionにadmin_idを持たせる
-                    redirect('admin/member_index');//redirectメソッドでmember/indexへリダイレクトさせる。
-                } else {//sessionデータがある場合は削除して再発行する処理
-                    $this->session->unset_userdata('admin_id');
-                    $this->session->set_userdata('admin_id', $admin->id);//sessionにmember.idを持たせる      
-                    redirect('admin/member_index');//redirectメソッドでtarget/indexへリダイレクトさせる。
-                }  
+                $admin = $this->Admin_model->findByEmail($admin['email']);//emailからadmin_idを検索
+                $this->session->set_userdata('admin_id', $admin->id);//sessionにadmin_idを持たせる
+                $this->session->set_flashdata('flash_message', '新しいadminを登録しました');
+                redirect('admin/member_index');//redirectメソッドでmember/indexへリダイレクトさせる
             }
         }
         
@@ -67,14 +77,19 @@
             $this->form_validation->set_rules('retirement_date', '退職日', 'regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');//日付のvalidation
             $this->form_validation->set_rules('division_id', '部署ID', 'required');
             $this->form_validation->set_rules('position', '役職ID', 'required');
-            $this->form_validation->set_rules('email', 'メールアドレス', 'required|is_unique[members.email]');//メールアドレスのvalidation。is_unique[テーブル名.カラム名]
+            $this->form_validation->set_rules('email', 'メールアドレス', 'required|regex_match[/^[a-zA-Z0-9_.+-]+[@][a-zA-Z0-9.-]+$/]|is_unique[members.email]');//メールアドレスのvalidation。is_unique[テーブル名.カラム名]
             $this->form_validation->set_rules('password', 'パスワード', 'required');
             $this->form_validation->set_rules('emergency_contact_address', '緊急連絡先電話番号', 'required|regex_match[/^(0{1}\d{9,10})$/]');//ハイフンなしの電話番号で制限するvalidation
+            
+            //validationメッセージ
+            $this->form_validation->set_message('required', '【{field}】が未入力です');
+            $this->form_validation->set_message('regex_match', '【{field}】の入力形式が違います');
+            $this->form_validation->set_message('is_unique', 'この【{field}】は既に登録済みです');
             
             if ($this->form_validation->run() == FALSE) {
                 $data['divisions'] = $this->Division_model->findAll();//プルダウンメニュー用の部署データを取得し、$dataに渡す。
                 $data['positions'] = $this->Position_model->findAll();//プルダウンメニュー用の役職データを取得し、$dataに渡す。
-                $this->load->view('admin/member_add', $data);
+                $this->showView('admin/member_add', $data);
             } else {//成功時には、dbへの登録を行う。
                 $member = [
                     'first_name' => $this->input->post('first_name'),//first_nameの値受け取り
@@ -93,6 +108,7 @@
                     'emergency_contact_address' => $this->input->post('emergency_contact_address')//emergency_contact_addressの値受け取り
                 ];
                 $this->Member_model->create($member);//Member_modelのcreateメソッドを実行
+                $this->session->set_flashdata('flash_message', '新しい社員を登録しました');
                 redirect('admin/member_index');
             }
         }
@@ -102,13 +118,18 @@
          */
         public function edit()
         {
-            $this->form_validation->set_rules('email', 'メールアドレス', 'required|callback_admin_email_check');//各種バリデーションの設定(空文字はfalse)
+            $this->form_validation->set_rules('email', 'メールアドレス', 'required|regex_match[/^[a-zA-Z0-9_.+-]+[@][a-zA-Z0-9.-]+$/]|callback_admin_email_check');//各種バリデーションの設定(空文字はfalse)
             $this->form_validation->set_rules('name', '氏名', 'required');
+            
+            //validationメッセージ
+            $this->form_validation->set_message('required', '【{field}】が未入力です');
+            $this->form_validation->set_message('regex_match', '【{field}】の入力形式が違います');
+            $this->form_validation->set_message('admin_email_check', 'この【{field}】は既に登録済みです');
             
             if ($this->form_validation->run() === FALSE) {//バリデーションに引っかかった場合の処理
                 $admin_id = $this->session->userdata('admin_id');//変数にsessionのadmin_idを代入する
                 $data['admin'] = $this->Admin_model->findById($admin_id);//idからadmin情報を取得する
-                $this->load->view('admin/edit', $data);//バリデーションに引っかかった場合にviewを返す
+                $this->showView('admin/edit', $data);//バリデーションに引っかかった場合にviewを返す
             } else {
                 $admin = [
                     'email' => $this->input->post('email'),//usersテーブルに新規登録する情報
@@ -116,6 +137,7 @@
                 ];
                 $admin_id = $this->session->userdata('admin_id');
                 $this->Admin_model->update($admin, $admin_id);
+                $this->session->set_flashdata('flash_message', 'admin情報を編集しました');
                 redirect('admin/member_index');//redirectメソッドでtarget/indexへリダイレクトさせる。
             }
         }
@@ -139,13 +161,20 @@
                 $this->form_validation->set_rules('retirement_date', '退職日', 'regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');//日付のvalidation
                 $this->form_validation->set_rules('division_id', '部署ID', 'required');
                 $this->form_validation->set_rules('position', '役職ID', 'required');
-                $this->form_validation->set_rules('email', 'メールアドレス', 'required|callback_member_email_check');//メールアドレスのvalidation
+                $this->form_validation->set_rules('email', 'メールアドレス', 'required|regex_match[/^[a-zA-Z0-9_.+-]+[@][a-zA-Z0-9.-]+$/]|callback_member_email_check');//メールアドレスのvalidation
                 $this->form_validation->set_rules('emergency_contact_address', '緊急連絡先電話番号', 'required|regex_match[/^(0{1}\d{9,10})$/]');//ハイフンなしの電話番号で制限するvalidation
 
+                //validationメッセージ
+                $this->form_validation->set_message('required', '【{field}】が未入力です');
+                $this->form_validation->set_message('regex_match', '【{field}】の入力形式が違います');
+                $this->form_validation->set_message('member_email_check', 'この【{field}】は既に登録済みです');
+                
                 if ($this->form_validation->run() === FALSE) {
                     $this->session->set_userdata('member_id', $member_id);
                     $data['member'] = $this->Member_model->findById($member_id);//引数のidをもとにmember情報を取得する
-                    $this->load->view('admin/member_edit', $data);
+                    $data['divisions'] = $this->Division_model->findAll();//プルダウンメニュー用の部署データを取得し、$dataに渡す。
+                    $data['positions'] = $this->Position_model->findAll();//プルダウンメニュー用の役職データを取得し、$dataに渡す。
+                    $this->showView('admin/member_edit', $data);
                 } else {
                     $updatedMember = [//上書きするデータの配列を作成
                         'first_name' => $this->input->post('first_name'),//first_nameの値受け取り
@@ -163,6 +192,7 @@
                         'emergency_contact_address' => $this->input->post('emergency_contact_address')//emergency_contact_addressの値受け取り
                     ];
                     $this->Member_model->update($updatedMember, $member_id);//member_modelのupdateメソッドで$updateMemberと$userIdを用いデータベースを上書きする。
+                    $this->session->set_flashdata('flash_message', '社員情報を編集しました');
                     redirect('admin/member_index');//redirectrメソッドでindexページへリダイレクト
                 }
             }
@@ -181,13 +211,11 @@
                 $member->position = $position;
             }
             $data['members'] = $members;
-            $content = $this->load->view('admin/member_index', $data, true);
-            $data['content'] = $content;
-            $this->load->view('layout/admin/layout', $data);
+            $this->showView('admin/member_index', $data);
         }
         
         /**
-         * 削除処理
+         * 社員削除処理
          * @param type $id
          */
         public function delete($id)//削除するidをパラメータより取得
@@ -196,16 +224,18 @@
                 redirect('user/logout');
             } else {
                 $this->Member_model->destroy($id);//Member_modelのdeleteメソッドを実行する
-                redirect('member/index');//redirectメソッドでindexページへリダイレクト
+                $this->session->set_flashdata('flash_message', '社員を削除しました');
+                redirect('admin/member_index');//redirectメソッドでindexページへリダイレクト
             }
         }
         
         /**
-         * logout処理
+         * adminのlogout処理
          */
         public function logout()
         {
             $this->session->unset_userdata('admin_id');//sessionを削除する
+            $this->session->set_flashdata('flash_message', 'ログアウトしました');
             redirect('login/admin');//loginページへリダイレクト
         }
         
@@ -216,9 +246,9 @@
         {
             $id = $this->session->userdata('admin_id');//sessionからadmin_idを取得して変数$idに代入
             $AdminBySession = $this->Admin_model->findById($id);//$idを用いてpost前のemailを取得する。(row();)
-            $checkedEmailCount = $this->Admin_model->findByEmail($email);//$emailを用いてpost時のemailからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
+            $checkedEmailCount = $this->Admin_model->findResultByEmail($email);//$emailを用いてpost時のemailからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
             //post前のemailとpost時のemailを比較 && $checkedEmailCountの返り値が1つの場合(post前のemailのみ) || post前とpost時のemailが異なる && $checkedEmailCountの返り値が空の場合(DBに重複emailがない)
-            if ($AdminBySession->email === $email && count($checkedEmailCount->email) === 1 || $AdminBySession->email !== $email && empty($checkedEmailCount->email)) {
+            if ($AdminBySession->email === $email && count($checkedEmailCount) === 1 || $AdminBySession->email !== $email && empty($checkedEmailCount)) {
                 return TRUE;
             } else {
                 return FALSE;
@@ -233,9 +263,9 @@
             $member_id = $this->session->userdata('member_id');
             $member = $this->Member_model->findById($member_id);//sessionからmember_idを取得して変数$idに代入
             $memberBySession = $this->Member_model->findById($member->id);//$idを用いてpost前のemailを取得する。(row();)
-            $checkedEmailCount = $this->Member_model->findByEmail($email);//$emailを用いてpost時のemailからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
+            $checkedEmailCount = $this->Member_model->findByPostEmail($email);//$emailを用いてpost時のemailからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
             //post前のemailとpost時のemailを比較 && $checkedEmailCountの返り値が1つの場合(post前のemailのみ) || post前とpost時のemailが異なる && $checkedEmailCountの返り値が空の場合(DBに重複emailがない)
-            if ($memberBySession->email === $email && count($checkedEmailCount->email) === 1 || $memberBySession->email !== $email && empty($checkedEmailCount->email)) {
+            if ($memberBySession->email === $email && count($checkedEmailCount) === 1 || $memberBySession->email !== $email && empty($checkedEmailCount)) {
                 return TRUE;
             } else {
                 return FALSE;

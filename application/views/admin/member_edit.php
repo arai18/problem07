@@ -50,20 +50,18 @@
     <?php echo form_input($retirement_date); ?><br />
 
     <?php echo form_label('部署ID'); ?>
-    <?php 
-        $division_options = [
-            0 => '0 : 開発部',
-            1 => '1 : 総務部'
-        ]; 
+    <?php
+        foreach ($divisions as $division) {
+            $division_options[$division->id] = "{$division->id} : {$division->division_name}"; 
+        }
     ?>
     <?php echo form_dropdown('division_id', $division_options, set_value('division_id', $member->division_id)); ?>
 
     <?php echo form_label('役職ID'); ?>
     <?php 
-        $position_options = [
-            0 => '0 : 社員',
-            1 => '1 : 部長'
-        ];
+        foreach ($positions as $position) {
+            $position_options[$position->id] = "{$position->id} : {$position->position_name}"; 
+        }
     ?>
     <?php echo form_dropdown('position', $position_options, set_value('position', $member->position)); ?><br />
 

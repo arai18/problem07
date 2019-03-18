@@ -13,6 +13,7 @@
         <a href="/division/index">部署名一覧</a>
         <a href="/position/index">役職名一覧</a>
         <a href="/admin/logout">ログアウト</a>
+        <br><br>
         
         <?php echo $content ?>
     </body>

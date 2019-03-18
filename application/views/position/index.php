@@ -1,4 +1,6 @@
-<h1>部署名一覧</h1>
+<?php echo $this->session->flashdata('flash_message'); ?>
+
+<h1>役職名一覧</h1>
 
 <h2><a href="/position/add">役職名追加</a></h2>
 
@@ -16,7 +18,7 @@
             <td><?php echo $position->id; ?></td>
             <td><?php echo $position->position_name; ?></td>
             <td><a href="/position/edit/<?php echo $position->id; ?>">編集</a></td>
-            <td><a href="/position/delete/<?php echo $position->id; ?>">削除</a></td>
+            <td><a href="/position/delete/<?php echo $position->id; ?>" class="delete">削除</a></td>
             <td><?php echo $position->created; ?></td>
             <td><?php echo $position->modified; ?></td>
         </tr>

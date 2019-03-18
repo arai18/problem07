@@ -31,7 +31,6 @@
             return $this->db->query($query, $id)->result();
         }
 
-
         /**
          * $member_id、$year、$termで検索しtargetを取得する。
          */
@@ -40,8 +39,18 @@
             $query = 'select * from targets where member_id = ? and year = ? and term = ?';
             return $this->db->query($query, [$member_id, $year, $term])->row();
         }
+        
+        /**
+         * member_idとyearで検索し該当targetを取得する。
+         */
+        public function findByIdAndYear($member_id, $year)
+        {
+            $query = 'select * from targets where member_id = ? and year = ?';
+            return $this->db->query($query, [$member_id, $year])->result();
+        }
+        
 
-                /**
+        /**
          * dbデータの上書き処理
          */
         public function update($updateTarget, $findTarget)//該当のtargetを更新する。
@@ -50,7 +59,7 @@
             $this->db->query($query, [$updateTarget['year'], $updateTarget['term'], $updateTarget['target'], $findTarget['member_id'], $findTarget['year'], $findTarget['term']]);
         }
 
-                /**
+        /**
          * 指定$member_idの目標を削除する
          */
         public function destroy($member_id, $year, $term)//該当のtargetを削除する。
