@@ -18,6 +18,7 @@
         private function showView($subView, $subData = '')
         {
             $content = $this->load->view($subView, $subData, true);
+            $data = [];
             $data['content'] = $content;
             $this->load->view('layout/admin/layout', $data);
         }
@@ -95,6 +96,7 @@
                 foreach ($divisions as $division) {//viewへ渡す部署名プルダウンメニュー
                     $division_options[$division->id] = "{$division->id} : {$division->division_name}";
                 }
+                $data = [];
                 $data['division_options'] = $division_options;
                 $positions = $this->Position_model->findAll();//プルダウンメニュー用の役職データを取得し、$dataに渡す。
                 $position_options = [];
@@ -140,6 +142,7 @@
             
             if ($this->form_validation->run() === FALSE) {//バリデーションに引っかかった場合の処理
                 $admin_id = $this->session->userdata('admin_id');//変数にsessionのadmin_idを代入する
+                $data = [];
                 $data['admin'] = $this->Admin_model->findById($admin_id);//idからadmin情報を取得する
                 if (!$data['admin']) {//nullの場合(不正アクセス)
                     $this->session->sess_destroy();
@@ -186,6 +189,7 @@
                 
                 if ($this->form_validation->run() === FALSE) {
                     $this->session->set_userdata('member_id', $member_id);
+                    $data = [];
                     $data['member'] = $this->Member_model->findById($member_id);//引数のidをもとにmember情報を取得する
                     if (!$data['member']) {//nullの場合(不正なアクセス)
                         $this->session->sess_destroy();
@@ -241,6 +245,7 @@
                     }
                     $member->position = $position;
                 }
+                $data = [];
                 $data['members'] = $members;
                 $this->showView('admin/member_index', $data);
             } 

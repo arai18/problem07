@@ -19,6 +19,7 @@ class Target extends CI_Controller {
     private function showView($subView, $subData = '')//content部分のviewを受け取る。viewに渡すdataも引数で受け取る
     {
         $content = $this->load->view($subView, $subData, true);//htmlを文字列にしたcontent(view)を変数に代入する
+        $data = [];
         $data['content'] = $content;//layout(view)に渡せるように$dataに代入する
         $this->load->view('layout/member/layout', $data);//layout/layout.phpを表示させる
     }
@@ -38,6 +39,7 @@ class Target extends CI_Controller {
     public function index() //$member_idにはsessionデータを入れる。
     {  
         $member_id = $this->session->userdata('member_id');
+        $data = [];
         $data['years'] = $this->Target_model->distinctYear($member_id);//重複しないyearを連想配列で取得する
         $data['targets'] = $this->Target_model->findById($member_id);//member_idに対応した情報を取得
         $this->showView('target/index', $data);
@@ -93,6 +95,7 @@ class Target extends CI_Controller {
                 $member_id = $this->session->userdata('member_id');
                 $this->session->set_userdata('year', $year);
                 $this->session->set_userdata('term', $term);
+                $data = [];
                 $data['target'] = $this->Target_model->findByTarget($member_id, $year, $term);//編集するtargetの既存データを取得する。
                 if (!$data['target']) {//nullの場合
                     $this->session->sess_destroy();

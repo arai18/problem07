@@ -26,6 +26,7 @@
         private function showView($subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す
         {
             $content = $this->load->view($subView, $subData, true);//コンテンツビューを文字列で取得する
+            $data = [];
             $data['content'] = $content;//レイアアウトビューに渡すdataを設定する
             $this->load->view('layout/admin/layout', $data);//layoutビューにコンテンツとdataを渡す
         }
@@ -67,6 +68,7 @@
                 if ($this->form_validation->run() === FALSE) {
                     $this->session->set_userdata('division_id', $id);
                     $division_id = $this->session->userdata('division_id');
+                    $data = [];
                     $data['division'] = $this->Division_model->findById($division_id);
                     if (!$data['division']) {//nullの場合(不正アクセス)
                         $this->session->sess_destroy();

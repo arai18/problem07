@@ -18,6 +18,7 @@
         private function showView($subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す
         {
             $content = $this->load->view($subView, $subData, true);//コンテンツビューを文字列で取得する
+            $data = [];
             $data['content'] = $content;//レイアアウトビューに渡すdataを設定する
             $this->load->view('layout/admin/layout', $data);//layoutビューにコンテンツとdataを渡す
         }
@@ -66,6 +67,7 @@
                 if ($this->form_validation->run() === FALSE) {
                     $this->session->set_userdata('position_id', $id);//position_idでsessionを設定する
                     $position_id = $this->session->userdata('position_id');//変数position_idにsessionを代入する
+                    $data = [];
                     $data['position'] = $this->Position_model->findById($position_id);//idからpositionデータを取得する
                     if (!$data['position']) {//nullの場合(不正アクセス)
                         $this->session->sess_destroy();
@@ -86,6 +88,7 @@
          */
         public function index()
         {
+            $data = [];
             $data['positions'] = $this->Position_model->findAll();//positionデータを全て取得する
             $this->showView('position/index', $data);//一覧ページへ飛ばす
         }

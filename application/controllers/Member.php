@@ -19,6 +19,7 @@
         private function showView($subView, $subData = '')
         {
             $content = $this->load->view($subView, $subData, true);
+            $data = [];
             $data['content'] = $content;
             $this->load->view('layout/member/layout', $data);
         }
@@ -50,6 +51,7 @@
             
             if ($this->form_validation->run() === FALSE) {
                 $member_id = $this->session->userdata('member_id');
+                $data = [];
                 $data['member'] = $this->Member_model->findById($member_id);//member_idがsessionと同じmemberデータを取得する。
                 if (!$data['member']) {//nullの場合(不正なアクセスのため)
                     $this->session->sess_destroy();
