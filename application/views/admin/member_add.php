@@ -14,7 +14,7 @@
     <?php echo form_input('last_name_kana', set_value('last_name_kana')); ?><br />
 
     <?php echo form_label('性別'); ?>
-    <?php echo form_dropdown('gender', [ 1 => '男', 2 => '女' ], set_value('gender')); ?><br />
+    <?php echo form_dropdown('gender', [ $this->Member_model->gender_mail => '男', $this->Member_model->gender_femail => '女' ], set_value('gender')); ?><br />
 
     <?php echo form_label('生年月日'); ?>
     <?php 

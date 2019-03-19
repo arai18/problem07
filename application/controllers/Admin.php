@@ -53,6 +53,10 @@
                 ];
                 $this->Admin_model->create($admin);//データベースへinsertする
                 $admin = $this->Admin_model->findByEmail($admin['email']);//emailからadmin_idを検索
+                if (!$admin) {
+                    $this->session->sess_destroy();
+                    show_404();
+                }
                 $this->session->set_userdata('admin_id', $admin->id);//sessionにadmin_idを持たせる
                 $this->session->set_flashdata('flash_message', '新しいadminを登録しました');
                 redirect('admin/member_index');//redirectメソッドでmember/indexへリダイレクトさせる
@@ -87,20 +91,13 @@
             
             if ($this->form_validation->run() === FALSE) {
                 $divisions = $this->Division_model->findAll();//プルダウンメニュー用の部署データを取得し、$dataに渡す。
-                if (!$divisions) {//部署名がnullの場合
-                    $this->session->set_flashdata('flash_message', '部署名が登録されていません。部署名を登録してください');
-                    redirect('division/index');//部署名一覧で登録を促す
-                }
                 $division_options = [];
                 foreach ($divisions as $division) {//viewへ渡す部署名プルダウンメニュー
                     $division_options[$division->id] = "{$division->id} : {$division->division_name}";
                 }
                 $data['division_options'] = $division_options;
                 $positions = $this->Position_model->findAll();//プルダウンメニュー用の役職データを取得し、$dataに渡す。
-                if (!$positions) {//役職名がnullの場合
-                    $this->session->set_flashdata('flash_message', '役職名が登録されていません。役職名を登録してください');
-                    redirect('position/index');//薬浴名名一覧で登録を促す
-                }
+                $position_options = [];
                 foreach ($positions as $position) {//viewへ渡す役職名プルダウンメニュー
                     $position_options[$position->id] = "{$position->id} : {$position->position_name}";
                 }
@@ -143,11 +140,10 @@
             
             if ($this->form_validation->run() === FALSE) {//バリデーションに引っかかった場合の処理
                 $admin_id = $this->session->userdata('admin_id');//変数にsessionのadmin_idを代入する
-                $data['admin'] = null;
-//                $data['admin'] = $this->Admin_model->findById($admin_id);//idからadmin情報を取得する
-                if (!$data['admin']) {//nullの場合
-                    $this->session->set_flashdata('flash_message', 'このAdminは存在しません');
-                    redirect('admin/member_index');//社員一覧ページに飛ばす
+                $data['admin'] = $this->Admin_model->findById($admin_id);//idからadmin情報を取得する
+                if (!$data['admin']) {//nullの場合(不正アクセス)
+                    $this->session->sess_destroy();
+                    show_404();
                 }
                 $this->showView('admin/edit', $data);//バリデーションに引っかかった場合にviewを返す
             } else {
@@ -191,9 +187,9 @@
                 if ($this->form_validation->run() === FALSE) {
                     $this->session->set_userdata('member_id', $member_id);
                     $data['member'] = $this->Member_model->findById($member_id);//引数のidをもとにmember情報を取得する
-                    if (!$data['member']) {//nullの場合
-                        $this->session->set_flashdata('flash_message', 'この社員番号は存在しません');
-                        redirect('admin/member_index');//社員一覧ページに飛ばす
+                    if (!$data['member']) {//nullの場合(不正なアクセス)
+                        $this->session->sess_destroy();
+                        show_404();
                     }
                     $data['divisions'] = $this->Division_model->findAll();//プルダウンメニュー用の部署データを取得し、$dataに渡す。
                     $data['positions'] = $this->Position_model->findAll();//プルダウンメニュー用の役職データを取得し、$dataに渡す。
@@ -228,19 +224,20 @@
         {
             $members = $this->Member_model->findAll();//配列でmemberのオブジェクトデータを取得する
             if (!$members) {//社員がnullの場合
-                $this->session->set_flashdata('flash_message', '社員が登録されていません');
-                $data['members'] = $members;
-                $this->showView('admin/member_index', $data);
+                $this->session->sess_destroy();
+                show_404();
             } else {
                 foreach ($members as $member) {//配列の要素を$memberに代入する          
                     $division = $this->Division_model->findById($member->division_id);//配列要素で取れた$memberのdivision_idキーでidを取り出し、dbで検索し、divisionデータを取り出す。
                     if (!$division) {//nullの場合
-                        $this->session->set_flashdata('flash_message', '部署IDは存在しません');
+                        $this->session->sess_destroy();
+                        show_404();
                     }
                     $member->division = $division;//divisionデータを$member->divisionに代入する
                     $position = $this->Position_model->findById($member->position);
                     if (!$position) {
-                        $this->session->set_flashdata('flash_message', '役職IDは存在しません');
+                        $this->session->sess_destroy();
+                        show_404();
                     }
                     $member->position = $position;
                 }
@@ -281,6 +278,10 @@
         {
             $id = $this->session->userdata('admin_id');//sessionからadmin_idを取得して変数$idに代入
             $AdminBySession = $this->Admin_model->findById($id);//$idを用いてpost前のemailを取得する。(row();)
+            if (!$AdminBySession) {//nullの場合(不正アクセス)
+                $this->session->sess_destroy();
+                show_404();
+            }
             $checkedEmailCount = $this->Admin_model->findResultByEmail($email);//$emailを用いてpost時のemailからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
             //post前のemailとpost時のemailを比較 && $checkedEmailCountの返り値が1つの場合(post前のemailのみ) || post前とpost時のemailが異なる && $checkedEmailCountの返り値が空の場合(DBに重複emailがない)
             if ($AdminBySession->email === $email && count($checkedEmailCount) === 1 || $AdminBySession->email !== $email && empty($checkedEmailCount)) {
@@ -297,8 +298,16 @@
         {
             $member_id = $this->session->userdata('member_id');
             $member = $this->Member_model->findById($member_id);//sessionからmember_idを取得して変数$idに代入
+            if (!$member) {
+                $this->session->sess_destroy();
+                show_404();
+            }
             $memberBySession = $this->Member_model->findById($member->id);//$idを用いてpost前のemailを取得する。(row();)
-            $checkedEmailCount = $this->Member_model->findByPostEmail($email);//$emailを用いてpost時のemailからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
+            if (!$memberBySession) {
+                $this->session->sess_destroy();
+                show_404();
+            }
+            $checkedEmailCount = $this->Member_model->findByPostEmail($email);//$emailを用いてpost時のemailからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)、連想配列→エラー処理なし
             //post前のemailとpost時のemailを比較 && $checkedEmailCountの返り値が1つの場合(post前のemailのみ) || post前とpost時のemailが異なる && $checkedEmailCountの返り値が空の場合(DBに重複emailがない)
             if ($memberBySession->email === $email && count($checkedEmailCount) === 1 || $memberBySession->email !== $email && empty($checkedEmailCount)) {
                 return TRUE;

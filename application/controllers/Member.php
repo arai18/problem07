@@ -51,9 +51,9 @@
             if ($this->form_validation->run() === FALSE) {
                 $member_id = $this->session->userdata('member_id');
                 $data['member'] = $this->Member_model->findById($member_id);//member_idがsessionと同じmemberデータを取得する。
-                if (!$data['member']) {//nullの場合('member/edit'でdataがなくなるため、エラーハンドルする)
-                    $this->session->set_flashdata('flash_message', '社員番号が取得できませんでした。お手数ですが、ログインしなおしてください');
-                    redirect('target/index');
+                if (!$data['member']) {//nullの場合(不正なアクセスのため)
+                    $this->session->sess_destroy();
+                    show_404();
                 }
                 $data['divisions'] = $this->Division_model->findAll();//プルダウンメニュー用の部署データを取得し、$dataに渡す。
                 $data['positions'] = $this->Position_model->findAll();//プルダウンメニュー用の役職データを取得し、$dataに渡す。
@@ -113,13 +113,13 @@
             $id = $this->session->userdata('member_id');//sessionからmember_idを取得して変数$idに代入
             $memberBySession = $this->Member_model->findById($id);//$idを用いてpost前のemailを取得する。(row();)
             if (!$memberBySession) {//nullの場合($memberBySession->emailがエラーになるため、エラーハンドル)
-                $this->session->set_flashdata('flash_message', '社員番号が取得できませんでした。お手数ですが、ログインしなおしてください。');
-                redirect('target/index');
+                $this->session->sess_destroy();
+                show_404();
             }
             $checkedEmailCount = $this->Member_model->findByPostEmail($email);//$emailを用いてpost時のemailからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
             if (!$checkedEmailCount) {//nullの場合(count()メソッドが使えなくなるため、エラーハンドル)
-                $this->session->set_flashdata('flash_message', 'メールアドレスが取得できませんでした。お手数ですが、ログインしなおしてください。');
-                redirect('target/index');
+                $this->session->sess_destroy();
+                show_404();
             }
             //post前のemailとpost時のemailを比較 && $checkedEmailCountの返り値が1つの場合(post前のemailのみ) || post前とpost時のemailが異なる && $checkedEmailCountの返り値が空の場合(DBに重複emailがない)
             if ($memberBySession->email === $email && count($checkedEmailCount) === 1 || $memberBySession->email !== $email && empty($checkedEmailCount)) {
@@ -137,8 +137,8 @@
             $id = $this->session->userdata('member_id');//sessionからmember_idを取得する
             $memberBySession = $this->Member_model->findById($id);//$idからmemberデータを取得する
             if (!$memberBySession) {//nullの場合
-                $this->session->set_flashdata('flash_message', '社員番号が取得できませんでした。お手数ですが、ログインしなおしてください。');
-                redirect('target/index');
+                $this->session->sess_destroy();
+                show_404();
             }
             $hashedOldPassword = $this->utility->getHash($password, $memberBySession->created);//post時のpasswordでハッシュ化
             if ($hashedOldPassword === $memberBySession->password) {//post前とpost時のpasswordを比較する
@@ -156,8 +156,8 @@
             $id = $this->session->userdata('member_id');//sessionからmember_idを取得する
             $memberBySession = $this->Member_model->findById($id);//$idからmemberデータを取得する
             if (!$memberBySession) {//nullの場合($memberBySession->passwordが取得できないため)
-                $this->session->set_flashdata('flash_message', '社員番号が取得できませんでした。お手数ですが、ログインしなおしてください。');
-                redirect('target/index');
+                $this->session->sess_destroy();
+                show_404();
             }
             $hashedNewPassword = $this->utility->getHash($password, $memberBySession->created);//post時のpasswordでハッシュ化
             if ($hashedNewPassword !== $memberBySession->password) {//post前とpost時のpasswordを比較する

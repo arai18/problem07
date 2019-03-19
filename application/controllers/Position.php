@@ -67,9 +67,9 @@
                     $this->session->set_userdata('position_id', $id);//position_idでsessionを設定する
                     $position_id = $this->session->userdata('position_id');//変数position_idにsessionを代入する
                     $data['position'] = $this->Position_model->findById($position_id);//idからpositionデータを取得する
-                    if (!$data['position']) {//nullの場合
-                        $this->session->set_flashdata('flash_message', '役職IDを取得できませんでした。お手数ですが、ログインしなおしてください。');
-                        redirect('position/index');
+                    if (!$data['position']) {//nullの場合(不正アクセス)
+                        $this->session->sess_destroy();
+                        show_404();
                     }
                     $this->showView('position/edit', $data);//idで取得したpositionデータをviewに渡す
                 } else {
@@ -112,15 +112,11 @@
         {
             $id = $this->session->userdata('position_id');
             $positionBySession = $this->Position_model->findById($id);//$idを用いてpost前のnameを取得する。(row();)
-            if (!$positionBySession) {//nullの場合
-                $this->session->set_flashdata('flash_message', '役職IDを取得できませんでした。お手数ですが、ログインしなおしてください。');
-                redirect('position/index');
+            if (!$positionBySession) {//nullの場合(不正アクセス)
+                $this->session->sess_destroy();
+                show_404();
             }
-            $positionByName = $this->Position_model->findByName($name);//$nameを用いてpost時のnameからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
-            if (!$positionByName) {
-                $this->session->set_flashdata('flash_message', '役職名を取得できませんでした。お手数ですが、ログインしなおしてください。');
-                redirect('position/index');
-            }
+            $positionByName = $this->Position_model->findByName($name);//$nameを用いてpost時のnameからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる),連想配列→エラー処理なし
             //post前のnameとpost時のnameを比較 && $$positionByNameの返り値が1つの場合(post前のnemeのみ) || post前とpost時のnameが異なる && $$positionByNameの返り値が空の場合(DBに重複nameがない)
             if ($positionBySession->position_name === $name && count($positionByName) === 1 || $positionBySession->position_name !== $name && empty($positionByName)) {
                 return TRUE;

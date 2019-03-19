@@ -2,6 +2,13 @@
 class Member_model extends CI_Model{
     
     /**
+     * genderのインスタンス変数を定義
+     */
+    public $gender_mail = 1;
+    public $gender_femail = 2;
+
+
+    /**
      * 全てのmemberを取得する
      * @return type
      */
