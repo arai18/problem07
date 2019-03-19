@@ -54,7 +54,7 @@ class Member_model extends CI_Model{
     /**
      * emailによりmemberデータを取得する
      */
-    public function findByEmail($email)
+    public function findByEmail(string $email)
     {
         $query = 'select * from members where email = ?';
         return $this->db->query($query, $email)->row();

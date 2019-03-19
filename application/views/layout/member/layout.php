@@ -9,7 +9,7 @@
     <a href="/target/index">目標一覧</a>
     <a href="/member/edit">メンバー情報変更</a>
     <a href="/member/edit_password">パスワード変更</a>
-    <a href="/member/logout">ログアウト</a>
+    <a href="/logout/member">ログアウト</a>
     <br><br>
     <?php echo $content ?>
 </body>

@@ -8,8 +8,7 @@
         public function __construct() {
             parent::__construct();
             if (!$this->session->userdata('admin_id')) {
-                $this->session->unset_userdata();
-                redirect('login/admin');
+                redirect('logout/admin');
             }
         }
         
@@ -36,13 +35,12 @@
          */
         public function add() 
         {
-            $this->form_validation->set_rules('email', 'メールアドレス', 'required|regex_match[/^[a-zA-Z0-9_.+-]+[@][a-zA-Z0-9.-]+$/]|is_unique[admin.email]');//各種バリデーションの設定(空文字はfalse)
+            $this->form_validation->set_rules('email', 'メールアドレス', 'required|valid_email|is_unique[admin.email]');//各種バリデーションの設定(空文字はfalse)
             $this->form_validation->set_rules('password', 'パスワード', 'required');
             $this->form_validation->set_rules('name', '氏名', 'required');
-            
             //validationメッセージ
             $this->form_validation->set_message('required', '【{field}】が未入力です');
-            $this->form_validation->set_message('regex_match', '【{field}】の入力形式が違います');
+            $this->form_validation->set_message('valid_email', '【{field}】の入力形式が違います');
             $this->form_validation->set_message('is_unique', 'この【{field}】は既に登録済みです');
             
             if ($this->form_validation->run() == FALSE) {
@@ -63,6 +61,8 @@
         
         /**
          * 社員の新規登録
+         * form_validationの１回目で部署名、役職名が登録されていなければ、各一覧ページへ飛ばし登録を促す。
+         * 
          */
         public function member_add() 
         {
@@ -77,18 +77,34 @@
             $this->form_validation->set_rules('retirement_date', '退職日', 'regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');//日付のvalidation
             $this->form_validation->set_rules('division_id', '部署ID', 'required');
             $this->form_validation->set_rules('position', '役職ID', 'required');
-            $this->form_validation->set_rules('email', 'メールアドレス', 'required|regex_match[/^[a-zA-Z0-9_.+-]+[@][a-zA-Z0-9.-]+$/]|is_unique[members.email]');//メールアドレスのvalidation。is_unique[テーブル名.カラム名]
+            $this->form_validation->set_rules('email', 'メールアドレス', 'required|valid_email|is_unique[members.email]');//メールアドレスのvalidation。is_unique[テーブル名.カラム名]
             $this->form_validation->set_rules('password', 'パスワード', 'required');
             $this->form_validation->set_rules('emergency_contact_address', '緊急連絡先電話番号', 'required|regex_match[/^(0{1}\d{9,10})$/]');//ハイフンなしの電話番号で制限するvalidation
-            
             //validationメッセージ
             $this->form_validation->set_message('required', '【{field}】が未入力です');
-            $this->form_validation->set_message('regex_match', '【{field}】の入力形式が違います');
+            $this->form_validation->set_message('valid_email', '【{field}】の入力形式が違います');
             $this->form_validation->set_message('is_unique', 'この【{field}】は既に登録済みです');
             
-            if ($this->form_validation->run() == FALSE) {
-                $data['divisions'] = $this->Division_model->findAll();//プルダウンメニュー用の部署データを取得し、$dataに渡す。
-                $data['positions'] = $this->Position_model->findAll();//プルダウンメニュー用の役職データを取得し、$dataに渡す。
+            if ($this->form_validation->run() === FALSE) {
+                $divisions = $this->Division_model->findAll();//プルダウンメニュー用の部署データを取得し、$dataに渡す。
+                if (!$divisions) {//部署名がnullの場合
+                    $this->session->set_flashdata('flash_message', '部署名が登録されていません。部署名を登録してください');
+                    redirect('division/index');//部署名一覧で登録を促す
+                }
+                $division_options = [];
+                foreach ($divisions as $division) {//viewへ渡す部署名プルダウンメニュー
+                    $division_options[$division->id] = "{$division->id} : {$division->division_name}";
+                }
+                $data['division_options'] = $division_options;
+                $positions = $this->Position_model->findAll();//プルダウンメニュー用の役職データを取得し、$dataに渡す。
+                if (!$positions) {//役職名がnullの場合
+                    $this->session->set_flashdata('flash_message', '役職名が登録されていません。役職名を登録してください');
+                    redirect('position/index');//薬浴名名一覧で登録を促す
+                }
+                foreach ($positions as $position) {//viewへ渡す役職名プルダウンメニュー
+                    $position_options[$position->id] = "{$position->id} : {$position->position_name}";
+                }
+                $data['position_options'] = $position_options;
                 $this->showView('admin/member_add', $data);
             } else {//成功時には、dbへの登録を行う。
                 $member = [
@@ -118,17 +134,21 @@
          */
         public function edit()
         {
-            $this->form_validation->set_rules('email', 'メールアドレス', 'required|regex_match[/^[a-zA-Z0-9_.+-]+[@][a-zA-Z0-9.-]+$/]|callback_admin_email_check');//各種バリデーションの設定(空文字はfalse)
+            $this->form_validation->set_rules('email', 'メールアドレス', 'required|valid_email|callback_admin_email_check');//各種バリデーションの設定(空文字はfalse)
             $this->form_validation->set_rules('name', '氏名', 'required');
-            
             //validationメッセージ
             $this->form_validation->set_message('required', '【{field}】が未入力です');
-            $this->form_validation->set_message('regex_match', '【{field}】の入力形式が違います');
+            $this->form_validation->set_message('valid_email', '【{field}】の入力形式が違います');
             $this->form_validation->set_message('admin_email_check', 'この【{field}】は既に登録済みです');
             
             if ($this->form_validation->run() === FALSE) {//バリデーションに引っかかった場合の処理
                 $admin_id = $this->session->userdata('admin_id');//変数にsessionのadmin_idを代入する
-                $data['admin'] = $this->Admin_model->findById($admin_id);//idからadmin情報を取得する
+                $data['admin'] = null;
+//                $data['admin'] = $this->Admin_model->findById($admin_id);//idからadmin情報を取得する
+                if (!$data['admin']) {//nullの場合
+                    $this->session->set_flashdata('flash_message', 'このAdminは存在しません');
+                    redirect('admin/member_index');//社員一覧ページに飛ばす
+                }
                 $this->showView('admin/edit', $data);//バリデーションに引っかかった場合にviewを返す
             } else {
                 $admin = [
@@ -161,17 +181,20 @@
                 $this->form_validation->set_rules('retirement_date', '退職日', 'regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');//日付のvalidation
                 $this->form_validation->set_rules('division_id', '部署ID', 'required');
                 $this->form_validation->set_rules('position', '役職ID', 'required');
-                $this->form_validation->set_rules('email', 'メールアドレス', 'required|regex_match[/^[a-zA-Z0-9_.+-]+[@][a-zA-Z0-9.-]+$/]|callback_member_email_check');//メールアドレスのvalidation
+                $this->form_validation->set_rules('email', 'メールアドレス', 'required|valid_email|callback_member_email_check');//メールアドレスのvalidation
                 $this->form_validation->set_rules('emergency_contact_address', '緊急連絡先電話番号', 'required|regex_match[/^(0{1}\d{9,10})$/]');//ハイフンなしの電話番号で制限するvalidation
-
                 //validationメッセージ
                 $this->form_validation->set_message('required', '【{field}】が未入力です');
-                $this->form_validation->set_message('regex_match', '【{field}】の入力形式が違います');
+                $this->form_validation->set_message('valid_email', '【{field}】の入力形式が違います');
                 $this->form_validation->set_message('member_email_check', 'この【{field}】は既に登録済みです');
                 
                 if ($this->form_validation->run() === FALSE) {
                     $this->session->set_userdata('member_id', $member_id);
                     $data['member'] = $this->Member_model->findById($member_id);//引数のidをもとにmember情報を取得する
+                    if (!$data['member']) {//nullの場合
+                        $this->session->set_flashdata('flash_message', 'この社員番号は存在しません');
+                        redirect('admin/member_index');//社員一覧ページに飛ばす
+                    }
                     $data['divisions'] = $this->Division_model->findAll();//プルダウンメニュー用の部署データを取得し、$dataに渡す。
                     $data['positions'] = $this->Position_model->findAll();//プルダウンメニュー用の役職データを取得し、$dataに渡す。
                     $this->showView('admin/member_edit', $data);
@@ -204,14 +227,26 @@
         public function member_index()
         {
             $members = $this->Member_model->findAll();//配列でmemberのオブジェクトデータを取得する
-            foreach ($members as $member) {//配列の要素を$memberに代入する          
-                $division = $this->Division_model->findById($member->division_id);//配列要素で取れた$memberのdivision_idキーでidを取り出し、dbで検索し、divisionデータを取り出す。
-                $member->division = $division;//divisionデータを$member->divisionに代入する
-                $position = $this->Position_model->findById($member->position);//
-                $member->position = $position;
-            }
-            $data['members'] = $members;
-            $this->showView('admin/member_index', $data);
+            if (!$members) {//社員がnullの場合
+                $this->session->set_flashdata('flash_message', '社員が登録されていません');
+                $data['members'] = $members;
+                $this->showView('admin/member_index', $data);
+            } else {
+                foreach ($members as $member) {//配列の要素を$memberに代入する          
+                    $division = $this->Division_model->findById($member->division_id);//配列要素で取れた$memberのdivision_idキーでidを取り出し、dbで検索し、divisionデータを取り出す。
+                    if (!$division) {//nullの場合
+                        $this->session->set_flashdata('flash_message', '部署IDは存在しません');
+                    }
+                    $member->division = $division;//divisionデータを$member->divisionに代入する
+                    $position = $this->Position_model->findById($member->position);
+                    if (!$position) {
+                        $this->session->set_flashdata('flash_message', '役職IDは存在しません');
+                    }
+                    $member->position = $position;
+                }
+                $data['members'] = $members;
+                $this->showView('admin/member_index', $data);
+            } 
         }
         
         /**

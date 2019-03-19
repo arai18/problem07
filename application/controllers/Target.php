@@ -3,7 +3,7 @@
 class Target extends CI_Controller {
     
     /**
-     * session['member_id']の条件分岐
+     * sessionの条件分岐
      */
     public function __construct() 
     {
@@ -28,7 +28,7 @@ class Target extends CI_Controller {
     */
     private function argumentCheck($year, $term)//if文の条件を共通化
     {
-        return !is_numeric($year, $term) || intval($year, $term) < 1;//returnしないと正常に動かない。
+        return !is_numeric($year) || intval($year) < 1 || !is_numeric($term) || intval($term) < 1;//returnしないと正常に動かない。
     }
     
     
@@ -38,9 +38,17 @@ class Target extends CI_Controller {
     public function index() //$member_idにはsessionデータを入れる。
     {  
         $member_id = $this->session->userdata('member_id');
-        $data['years'] = $this->Target_model->distinctYear($member_id);//重複しないyearを連想配列で取得する
+        $data['years'] = 0;
+//        $data['years'] = $this->Target_model->distinctYear($member_id);//重複しないyearを連想配列で取得する
         $data['targets'] = $this->Target_model->findById($member_id);//member_idに対応した情報を取得
-        $this->showView('target/index', $data);
+        if (!$data['years']) {//nullの場合
+//            if (!$this->session->flashdata()) {
+                $this->session->set_flashdata('flash_message', '目標は存在しません');
+//            }
+            $this->showView('target/index', $data);
+        } else {
+            $this->showView('target/index', $data);
+        }
     }
     
     /**
@@ -68,7 +76,7 @@ class Target extends CI_Controller {
             $member_id = $this->session->userdata('member_id');//sessionのデータを変数$member_idに格納する。
             $this->Target_model->create($target, $member_id);//dbへtargetの内容とmember_idを登録する。
             $this->session->set_flashdata('flash_message', '新しい目標を追加しました');
-            redirect("target/index");//各ユーザのindexページへリダイレクトする。
+            redirect('target/index');//各ユーザのindexページへリダイレクトする。
         }
     }
     
@@ -94,8 +102,11 @@ class Target extends CI_Controller {
                 $member_id = $this->session->userdata('member_id');
                 $this->session->set_userdata('year', $year);
                 $this->session->set_userdata('term', $term);
-                var_dump($this->session->userdata('year'));
                 $data['target'] = $this->Target_model->findByTarget($member_id, $year, $term);//編集するtargetの既存データを取得する。
+                if (!$data['target']) {
+                    $this->session->set_flashdata('この年度の四半期目標は存在しません');
+                    redirect('target/edit');
+                }
                 $this->showView('target/edit', $data);//$data['target']を引数にviewを返す。
             } else {
                 $member_id = $this->session->userdata('member_id');
@@ -140,6 +151,10 @@ class Target extends CI_Controller {
     {
         $member_id = $this->session->userdata('member_id');//member_idを取得する
         $targets = $this->Target_model->findByIdAndYear($member_id, $year);//post時のtargetを連想配列で受け取る
+        if (!$targets) {
+            $this->session->set_flashdata('flash_message', 'この社員番号は存在しません');
+            redirect('');
+        }
         if (count($targets) < 4) {//db内にtargetが3つ以下であれば通す
             return TRUE;
         } else {
@@ -173,7 +188,7 @@ class Target extends CI_Controller {
         $member_id = $this->session->userdata('member_id');
         $postYear = $this->input->post('year');//post時のyearを取得する
         $target = $this->Target_model->findByTarget($member_id, $postYear, $term);//post時のmember_idとyearとtermで取得する
-        if (!$targec) {//存在しなければ通す
+        if (!$target) {//存在しなければ通す
             return TRUE;
         } else {
             return FALSE;
@@ -190,7 +205,6 @@ class Target extends CI_Controller {
         $target = $this->Target_model->findByTarget($member_id, $postYear, $term);//post時のtargetを取得する
         $postBeforeYear = $this->session->userdata('year');//post前のyear
         $postBeforeTerm = $this->session->userdata('term');//post前のterm
-        var_dump($postBeforeTerm);
         //編集せずにpostした場合　|| post時のmember_idとpostYearとtermで検索しtargetがない場合
         if ($term === $postBeforeTerm && $postYear === $postBeforeYear || !$target) {
             return TRUE;
