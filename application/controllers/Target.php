@@ -3,7 +3,7 @@
 class Target extends CI_Controller {
     
     /**
-     * session['member_id']の条件分岐
+     * sessionの条件分岐
      */
     public function __construct() 
     {
@@ -19,6 +19,7 @@ class Target extends CI_Controller {
     private function showView($subView, $subData = '')//content部分のviewを受け取る。viewに渡すdataも引数で受け取る
     {
         $content = $this->load->view($subView, $subData, true);//htmlを文字列にしたcontent(view)を変数に代入する
+        $data = [];
         $data['content'] = $content;//layout(view)に渡せるように$dataに代入する
         $this->load->view('layout/member/layout', $data);//layout/layout.phpを表示させる
     }
@@ -28,7 +29,7 @@ class Target extends CI_Controller {
     */
     private function argumentCheck($year, $term)//if文の条件を共通化
     {
-        return !is_numeric($year, $term) || intval($year, $term) < 1;//returnしないと正常に動かない。
+        return !is_numeric($year) || intval($year) < 1 || !is_numeric($term) || intval($term) < 1;//returnしないと正常に動かない。
     }
     
     
@@ -38,6 +39,7 @@ class Target extends CI_Controller {
     public function index() //$member_idにはsessionデータを入れる。
     {  
         $member_id = $this->session->userdata('member_id');
+        $data = [];
         $data['years'] = $this->Target_model->distinctYear($member_id);//重複しないyearを連想配列で取得する
         $data['targets'] = $this->Target_model->findById($member_id);//member_idに対応した情報を取得
         $this->showView('target/index', $data);
@@ -68,7 +70,7 @@ class Target extends CI_Controller {
             $member_id = $this->session->userdata('member_id');//sessionのデータを変数$member_idに格納する。
             $this->Target_model->create($target, $member_id);//dbへtargetの内容とmember_idを登録する。
             $this->session->set_flashdata('flash_message', '新しい目標を追加しました');
-            redirect("target/index");//各ユーザのindexページへリダイレクトする。
+            redirect('target/index');//各ユーザのindexページへリダイレクトする。
         }
     }
     
@@ -80,7 +82,6 @@ class Target extends CI_Controller {
         $this->form_validation->set_rules('year', '年度', 'required|regex_match[/^[0-9]{4}$/]|callback_year_edit_check');
         $this->form_validation->set_rules('term', '期間', 'required|callback_term_edit_check');
         $this->form_validation->set_rules('target', '目標', 'required');
-        
         //validationメッセージ
         $this->form_validation->set_message('required', '【{field}】が未入力です');
         $this->form_validation->set_message('regex_match', '【{field}】の入力形式が違います');
@@ -94,8 +95,12 @@ class Target extends CI_Controller {
                 $member_id = $this->session->userdata('member_id');
                 $this->session->set_userdata('year', $year);
                 $this->session->set_userdata('term', $term);
-                var_dump($this->session->userdata('year'));
+                $data = [];
                 $data['target'] = $this->Target_model->findByTarget($member_id, $year, $term);//編集するtargetの既存データを取得する。
+                if (!$data['target']) {//nullの場合
+                    $this->session->sess_destroy();
+                    show_404();
+                }
                 $this->showView('target/edit', $data);//$data['target']を引数にviewを返す。
             } else {
                 $member_id = $this->session->userdata('member_id');
@@ -139,7 +144,7 @@ class Target extends CI_Controller {
     public function year_add_check($year)
     {
         $member_id = $this->session->userdata('member_id');//member_idを取得する
-        $targets = $this->Target_model->findByIdAndYear($member_id, $year);//post時のtargetを連想配列で受け取る
+        $targets = $this->Target_model->findByIdAndYear(100, 2200);//post時のtargetを連想配列で受け取る
         if (count($targets) < 4) {//db内にtargetが3つ以下であれば通す
             return TRUE;
         } else {
@@ -153,7 +158,7 @@ class Target extends CI_Controller {
     public function year_edit_check($year)
     {
         $member_id = $this->session->userdata('member_id');
-        $targets = $this->Target_model->findByIdAndYear($member_id, $year);//post時のtargetを連想配列で受け取る
+        $targets = $this->Target_model->findByIdAndYear($member_id, $year);//post時のtargetを連想配列で受け取る→エラー処理なし  
         $postBeforeYear = $this->session->userdata('year');//post前のyearをeditの引数からsessionを通して取得する
         foreach ($targets as $target) {
             //返り値の配列が4以下でpost前とpost時とyearが同じ場合(何も変更しないで編集した場合) || 返り値の配列が3以下でpost前とpost時のyearが違う場合
@@ -172,8 +177,8 @@ class Target extends CI_Controller {
     {
         $member_id = $this->session->userdata('member_id');
         $postYear = $this->input->post('year');//post時のyearを取得する
-        $target = $this->Target_model->findByTarget($member_id, $postYear, $term);//post時のmember_idとyearとtermで取得する
-        if (!$targec) {//存在しなければ通す
+        $target = $this->Target_model->findByTarget($member_id, $postYear, $term);//次の処理に影響がないため、エラー処理なし
+        if (!$target) {//存在しなければ通す
             return TRUE;
         } else {
             return FALSE;
@@ -187,10 +192,9 @@ class Target extends CI_Controller {
     {
         $member_id = $this->session->userdata('member_id');
         $postYear = $this->input->post('year');
-        $target = $this->Target_model->findByTarget($member_id, $postYear, $term);//post時のtargetを取得する
+        $target = $this->Target_model->findByTarget($member_id, $postYear, $term);//post時のtargetを取得する、row()でも次の処理に必要なためエラー処理なし。
         $postBeforeYear = $this->session->userdata('year');//post前のyear
         $postBeforeTerm = $this->session->userdata('term');//post前のterm
-        var_dump($postBeforeTerm);
         //編集せずにpostした場合　|| post時のmember_idとpostYearとtermで検索しtargetがない場合
         if ($term === $postBeforeTerm && $postYear === $postBeforeYear || !$target) {
             return TRUE;

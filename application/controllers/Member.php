@@ -9,8 +9,7 @@
         {
             parent::__construct();
             if (!$this->session->userdata('member_id')) {//session情報がない場合の処理
-                $this->session->unset_userdata('member_id');
-                redirect('member/login');
+                redirect('logout/member');
             }
         }
         
@@ -20,6 +19,7 @@
         private function showView($subView, $subData = '')
         {
             $content = $this->load->view($subView, $subData, true);
+            $data = [];
             $data['content'] = $content;
             $this->load->view('layout/member/layout', $data);
         }
@@ -42,17 +42,21 @@
             $this->form_validation->set_rules('retirement_date', '退職日', 'regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');//日付のvalidation
             $this->form_validation->set_rules('division_id', '部署ID', 'required');
             $this->form_validation->set_rules('position', '役職ID', 'required');
-            $this->form_validation->set_rules('email', 'メールアドレス', 'required|callback_email_check');//メールアドレスのvalidation
+            $this->form_validation->set_rules('email', 'メールアドレス', 'required|valid_email|callback_email_check');//メールアドレスのvalidation
             $this->form_validation->set_rules('emergency_contact_address', '緊急連絡先電話番号', 'required|regex_match[/^(0{1}\d{9,10})$/]');//ハイフンなしの電話番号で制限するvalidation
-
             //validationメッセージ
             $this->form_validation->set_message('required', '【{field}】が未入力です');
-            $this->form_validation->set_message('regex_match', '【{field}】の入力形式が違います');
+            $this->form_validation->set_message('valid_email', '【{field}】の入力形式が違います');
             $this->form_validation->set_message('email_check', 'この【{field}】は既に登録済みです');
             
             if ($this->form_validation->run() === FALSE) {
                 $member_id = $this->session->userdata('member_id');
+                $data = [];
                 $data['member'] = $this->Member_model->findById($member_id);//member_idがsessionと同じmemberデータを取得する。
+                if (!$data['member']) {//nullの場合(不正なアクセスのため)
+                    $this->session->sess_destroy();
+                    show_404();
+                }
                 $data['divisions'] = $this->Division_model->findAll();//プルダウンメニュー用の部署データを取得し、$dataに渡す。
                 $data['positions'] = $this->Position_model->findAll();//プルダウンメニュー用の役職データを取得し、$dataに渡す。
                 $this->showView('member/edit', $data);//$dataでlayoutに渡し、表示させる。
@@ -86,7 +90,6 @@
         {
             $this->form_validation->set_rules('old_password', '現在のパスワード', 'required|callback_old_password_check');//現在のパスワードが一致しているか確認する。
             $this->form_validation->set_rules('new_password', '新しいパスワード', 'required|callback_new_password_check');//現在のパスワードと新規のパスワードが一致していないか確認する。
-
             //validationメッセージ
             $this->form_validation->set_message('required', '【{field}】が未入力です');
             $this->form_validation->set_message('old_password_check', '【{field}】正しくありません');
@@ -104,16 +107,6 @@
         }
         
         /**
-         * memberのログアウト機能
-         */
-        public function logout()
-        {
-            $this->session->unset_userdata('member_id');//sessionを削除する
-            $this->session->set_flashdata('logout', 'ログアウトしました');
-            redirect('login/member');//loginページへリダイレクト
-        }
-        
-        /**
          * callback処理
          * emailのvalidation設定
          */
@@ -121,7 +114,15 @@
         {
             $id = $this->session->userdata('member_id');//sessionからmember_idを取得して変数$idに代入
             $memberBySession = $this->Member_model->findById($id);//$idを用いてpost前のemailを取得する。(row();)
+            if (!$memberBySession) {//nullの場合($memberBySession->emailがエラーになるため、エラーハンドル)
+                $this->session->sess_destroy();
+                show_404();
+            }
             $checkedEmailCount = $this->Member_model->findByPostEmail($email);//$emailを用いてpost時のemailからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
+            if (!$checkedEmailCount) {//nullの場合(count()メソッドが使えなくなるため、エラーハンドル)
+                $this->session->sess_destroy();
+                show_404();
+            }
             //post前のemailとpost時のemailを比較 && $checkedEmailCountの返り値が1つの場合(post前のemailのみ) || post前とpost時のemailが異なる && $checkedEmailCountの返り値が空の場合(DBに重複emailがない)
             if ($memberBySession->email === $email && count($checkedEmailCount) === 1 || $memberBySession->email !== $email && empty($checkedEmailCount)) {
                 return TRUE;
@@ -137,6 +138,10 @@
         {
             $id = $this->session->userdata('member_id');//sessionからmember_idを取得する
             $memberBySession = $this->Member_model->findById($id);//$idからmemberデータを取得する
+            if (!$memberBySession) {//nullの場合
+                $this->session->sess_destroy();
+                show_404();
+            }
             $hashedOldPassword = $this->utility->getHash($password, $memberBySession->created);//post時のpasswordでハッシュ化
             if ($hashedOldPassword === $memberBySession->password) {//post前とpost時のpasswordを比較する
                 return TRUE;
@@ -152,6 +157,10 @@
         {
             $id = $this->session->userdata('member_id');//sessionからmember_idを取得する
             $memberBySession = $this->Member_model->findById($id);//$idからmemberデータを取得する
+            if (!$memberBySession) {//nullの場合($memberBySession->passwordが取得できないため)
+                $this->session->sess_destroy();
+                show_404();
+            }
             $hashedNewPassword = $this->utility->getHash($password, $memberBySession->created);//post時のpasswordでハッシュ化
             if ($hashedNewPassword !== $memberBySession->password) {//post前とpost時のpasswordを比較する
                 return TRUE;

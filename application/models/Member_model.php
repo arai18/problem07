@@ -2,6 +2,13 @@
 class Member_model extends CI_Model{
     
     /**
+     * genderのインスタンス変数を定義
+     */
+    public $gender_mail = 1;
+    public $gender_femail = 2;
+
+
+    /**
      * 全てのmemberを取得する
      * @return type
      */
@@ -54,7 +61,7 @@ class Member_model extends CI_Model{
     /**
      * emailによりmemberデータを取得する
      */
-    public function findByEmail($email)
+    public function findByEmail(string $email)
     {
         $query = 'select * from members where email = ?';
         return $this->db->query($query, $email)->row();

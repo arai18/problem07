@@ -26,6 +26,7 @@
         private function showView($subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す
         {
             $content = $this->load->view($subView, $subData, true);//コンテンツビューを文字列で取得する
+            $data = [];
             $data['content'] = $content;//レイアアウトビューに渡すdataを設定する
             $this->load->view('layout/admin/layout', $data);//layoutビューにコンテンツとdataを渡す
         }
@@ -61,17 +62,22 @@
             $this->form_validation->set_message('required', '【{field}】が未入力です');
             $this->form_validation->set_message('name_check', 'この【{field}】は既に登録済みです');
             
-            if ($this->argumentCheck($id)) {
+            if ($this->argumentCheck($id)) {//整数1以上の条件分岐
                 redirect('admin/logout');
             } else {
                 if ($this->form_validation->run() === FALSE) {
                     $this->session->set_userdata('division_id', $id);
                     $division_id = $this->session->userdata('division_id');
+                    $data = [];
                     $data['division'] = $this->Division_model->findById($division_id);
+                    if (!$data['division']) {//nullの場合(不正アクセス)
+                        $this->session->sess_destroy();
+                        show_404();
+                    }
                     $this->showView('division/edit', $data);
-                } else {
+                } else {//validationに通った場合
                     $division = ['name' => $this->input->post('name')];
-                    $this->Division_model->update($division, $id);
+                    $this->Division_model->update($division, $id);//update処理
                     $this->session->set_flashdata('flash_message', '部署名を編集しました');
                     redirect('division/index');
                 }
@@ -83,7 +89,7 @@
          */
         public function index()
         {
-            $data['divisions'] = $this->Division_model->findAll();
+            $data['divisions'] = $this->Division_model->findAll();//連想配列での取得のため、エラーハンドルなし。
             $this->showView('division/index', $data);
         }
         
@@ -109,9 +115,13 @@
         {
             $id = $this->session->userdata('division_id');
             $divisionBySession = $this->Division_model->findById($id);//$idを用いてpost前のnameを取得する。(row();)
-            $divisionByName = $this->Division_model->findByName($name);//$nameを用いてpost時のnameからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)
+            if (!$divisionBySession) {//nullの場合(不正アクセス)
+                $this->session->sess_destroy();
+                show_404();
+            }
+            $divisionByName = $this->Division_model->findByName($name);//$nameを用いてpost時のnameからdb内に同じemailが1以上あるかを調べる。(resutl();→全フィールドから該当のものを取得できる)、連想配列→エラー処理なし
             //post前のnameとpost時のnameを比較 && $checkedNameCountの返り値が1つの場合(post前のnemeのみ) || post前とpost時のnameが異なる && $checkedNameCountの返り値が空の場合(DBに重複nameがない)
-            if ($divisionBySession->division_name === $name && count($divisionByName->division_name) === 1 || $divisionBySession->division_name !== $email && empty($divisionByName->division_name)) {
+            if ($divisionBySession->division_name === $name && count($divisionByName) === 1 || $divisionBySession->division_name !== $name && empty($divisionByName)) {
                 return TRUE;
             } else {
                 return FALSE;

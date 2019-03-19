@@ -39,5 +39,4 @@ class Migrate extends CI_Controller {
             log_message('error', $this->migration->error_string());
         }   
     }
-
 }
