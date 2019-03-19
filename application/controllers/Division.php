@@ -89,6 +89,7 @@
          */
         public function index()
         {
+            $data = [];
             $data['divisions'] = $this->Division_model->findAll();//連想配列での取得のため、エラーハンドルなし。
             $this->showView('division/index', $data);
         }
