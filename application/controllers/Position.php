@@ -8,14 +8,14 @@
         public function __construct() {
             parent::__construct();
             if (!$this->session->userdata('admin_id')) {
-                redirect('admin/logout');
+                redirect('logout/admin');
             }
         }
         
         /**
          * adminのview統合表示
          */
-        private function showView($subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す
+        private function showView(string $subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す
         {
             $content = $this->load->view($subView, $subData, true);//コンテンツビューを文字列で取得する
             $data = [];
@@ -26,7 +26,7 @@
         /**
          * 引数に整数のみ受け付ける条件
          */
-        private function argumentCheck($id)//if文の条件を共通化
+        private function argumentCheck(int $id)//if文の条件を共通化
         {
             return !is_numeric($id) || intval($id) < 1;//returnしないと正常に動かない。
         }
@@ -54,7 +54,7 @@
         /**
          * 役職名の編集
          */
-        public function edit($id)
+        public function edit(int $id)
         {
             $this->form_validation->set_rules('name', '役職名', 'required|callback_name_check');
             //validationメッセージ
@@ -96,7 +96,7 @@
         /**
          * 役職名削除
          */
-        public function delete($id)
+        public function delete(int $id)
         {
             if ($this->argumentCheck($id)) {
                 redirect('admin/logout');

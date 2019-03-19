@@ -52,7 +52,7 @@ class Member_model extends CI_Model{
      * @param type $id
      * @return type
      */
-    public function findById($id) //整数値のみ受け付けるように処理するよう変更をする。
+    public function findById(int $id) //整数値のみ受け付けるように処理するよう変更をする。
     {
         $query = 'select * from members where id = ?';
         return $this->db->query($query, $id)->row();//dbよりmembersテーブルからidが一致するものを返す
@@ -70,7 +70,7 @@ class Member_model extends CI_Model{
     /**
      * emailによりmemberデータを取得する
      */
-    public function findByPostEmail(string $email)
+    public function findByPostEmail($email)//型宣言なし
     {
         $query = 'select email from members where email = ?';
         return $this->db->query($query, $email)->result();
@@ -81,7 +81,7 @@ class Member_model extends CI_Model{
      * @param type $data
      * @param type $userId
      */
-    public function update($data, $member_id) 
+    public function update(array $data, int $member_id) 
     {
         $query = 'update members set first_name = ?, last_name = ?, first_name_kana = ?, last_name_kana = ?, gender = ?, birthday = ?, address = ?, entering_company_date = ?, retirement_date = ?, division_id = ?, position = ?, email = ?, emergency_contact_address = ?  where id = ?';
         $this->db->query($query, [
@@ -105,7 +105,7 @@ class Member_model extends CI_Model{
     /**
      * passwordのupdate処理
      */
-    public function updatePassword($password, $member_id)
+    public function updatePassword(string $password, int $member_id)
     {
         $query = 'update members set password = ? where id = ?';
         $getMember = $this->Member_model->findById($member_id);
@@ -116,7 +116,7 @@ class Member_model extends CI_Model{
      * 該当するidを持つmemberを削除する
      * @param type $id
      */
-    public function destroy($id) 
+    public function destroy(int $id) 
     {
         $query = 'delete from members where id = ?';
         $this->db->query($query, $id);//該当するidを持つmemberを検索し、削除する。

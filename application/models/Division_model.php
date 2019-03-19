@@ -22,7 +22,7 @@ class Division_model extends CI_Model{
     /**
      * nameから部署名を取得する
      */
-    public function findByName($name)
+    public function findByName($name)//callback関数でpost値を引数にするため、型宣言なし
     {
         $query = 'select * from divisions where division_name = ?';
         return $this->db->query($query, $name)->result();
@@ -31,7 +31,7 @@ class Division_model extends CI_Model{
     /**
      * dbへの登録
      */
-    public function create($name)
+    public function create(array $name)
     {
         $query = 'insert into divisions(division_name) values(?)';
         $this->db->query($query, $name);
@@ -40,7 +40,7 @@ class Division_model extends CI_Model{
     /**
      * 部署名の更新
      */
-    public function update($division, $id)
+    public function update(array $division, int $id)
     {
         $query = 'update divisions set division_name = ? where id = ?';
         $this->db->query($query, [$division['name'], $id]);
@@ -49,7 +49,7 @@ class Division_model extends CI_Model{
     /**
     * 部署名の削除
     */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $query = 'delete from divisions where id = ?';
         $this->db->query($query, $id);

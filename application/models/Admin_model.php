@@ -18,7 +18,7 @@
         /**
          * idからadmin情報を取得する
          */
-        public function findById($id)
+        public function findById(int $id)
         {
             $query = 'select * from admin where id = ?';
             return $this->db->query($query, $id)->row();
@@ -36,7 +36,7 @@
         /**
          * emailによってadminデータを取得する
          */
-        public function findByEmail($email)
+        public function findByEmail(string $email)
         {
             $query = 'select * from admin where email = ?';
             return $this->db->query($query, $email)->row();
@@ -45,7 +45,7 @@
         /**
          * 更新処理
          */
-        public function update(array $data, $id)
+        public function update(array $data, int $id)
         {
             $query = 'update admin set email = ?, name = ? where id = ?';
             $this->db->query($query, [$data['email'], $data['name'], $id]);
