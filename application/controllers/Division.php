@@ -23,7 +23,7 @@
         /**
          * adminのview統合表示
          */
-        private function showView($subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す
+        private function showView(string $subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す(ユーザが入力できる引数では無いので型宣言できる)
         {
             $content = $this->load->view($subView, $subData, true);//コンテンツビューを文字列で取得する
             $data = [];
@@ -89,6 +89,7 @@
          */
         public function index()
         {
+            $data = [];
             $data['divisions'] = $this->Division_model->findAll();//連想配列での取得のため、エラーハンドルなし。
             $this->showView('division/index', $data);
         }
@@ -128,4 +129,3 @@
             }
         }
     }
-

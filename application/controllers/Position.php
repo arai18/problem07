@@ -8,14 +8,14 @@
         public function __construct() {
             parent::__construct();
             if (!$this->session->userdata('admin_id')) {
-                redirect('admin/logout');
+                redirect('logout/admin');
             }
         }
         
         /**
          * adminのview統合表示
          */
-        private function showView($subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す
+        private function showView(string $subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す
         {
             $content = $this->load->view($subView, $subData, true);//コンテンツビューを文字列で取得する
             $data = [];

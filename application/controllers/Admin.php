@@ -15,7 +15,7 @@
         /**
          * admin用のview
          */
-        private function showView($subView, $subData = '')
+        private function showView(string $subView, $subData = '')
         {
             $content = $this->load->view($subView, $subData, true);
             $data = [];
@@ -26,7 +26,7 @@
         /**
          * 引数に整数のみ受け付ける条件
          */
-        private function argumentCheck($id)//if文の条件を共通化
+        private function argumentCheck($id)//if文の条件を共通化(ユーザからダイレクトで受け取るため型宣言できない)
         {
             return !is_numeric($id) || intval($id) < 1;//returnしないと正常に動かない。
         }
@@ -87,6 +87,7 @@
             $this->form_validation->set_rules('emergency_contact_address', '緊急連絡先電話番号', 'required|regex_match[/^(0{1}\d{9,10})$/]');//ハイフンなしの電話番号で制限するvalidation
             //validationメッセージ
             $this->form_validation->set_message('required', '【{field}】が未入力です');
+            $this->form_validation->set_message('regex_match', '【{field}】入力でお願いします');
             $this->form_validation->set_message('valid_email', '【{field}】の入力形式が違います');
             $this->form_validation->set_message('is_unique', 'この【{field}】は既に登録済みです');
             
@@ -184,6 +185,7 @@
                 $this->form_validation->set_rules('emergency_contact_address', '緊急連絡先電話番号', 'required|regex_match[/^(0{1}\d{9,10})$/]');//ハイフンなしの電話番号で制限するvalidation
                 //validationメッセージ
                 $this->form_validation->set_message('required', '【{field}】が未入力です');
+                $this->form_validation->set_message('regex_match', '【{field}】入力でお願いします');
                 $this->form_validation->set_message('valid_email', '【{field}】の入力形式が違います');
                 $this->form_validation->set_message('member_email_check', 'この【{field}】は既に登録済みです');
                 
@@ -319,8 +321,6 @@
             } else {
                 return FALSE;
             }
-        }
-        
-        
+        }  
     }
        

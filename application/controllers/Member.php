@@ -16,7 +16,7 @@
         /**
          * viewを表示する処理(社員ページ用)
          */
-        private function showView($subView, $subData = '')
+        private function showView(string $subView, $subData = '')
         {
             $content = $this->load->view($subView, $subData, true);
             $data = [];
@@ -107,7 +107,8 @@
         }
         
         /**
-         * callback処理
+         * コールバック処理
+         * 
          * emailのvalidation設定
          */
         public function email_check($email)

@@ -1,5 +1,5 @@
 <?php
-//defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 class Target extends CI_Controller {
     
     /**
@@ -16,7 +16,7 @@ class Target extends CI_Controller {
     /**
      * viewを表示する処理
      */
-    private function showView($subView, $subData = '')//content部分のviewを受け取る。viewに渡すdataも引数で受け取る
+    private function showView(string $subView, $subData = '')//content部分のviewを受け取る。viewに渡すdataも引数で受け取る
     {
         $content = $this->load->view($subView, $subData, true);//htmlを文字列にしたcontent(view)を変数に代入する
         $data = [];
@@ -78,7 +78,7 @@ class Target extends CI_Controller {
      *  目標の編集
      */
     public function edit($year, $term)
-    {
+    { 
         $this->form_validation->set_rules('year', '年度', 'required|regex_match[/^[0-9]{4}$/]|callback_year_edit_check');
         $this->form_validation->set_rules('term', '期間', 'required|callback_term_edit_check');
         $this->form_validation->set_rules('target', '目標', 'required');
@@ -144,7 +144,7 @@ class Target extends CI_Controller {
     public function year_add_check($year)
     {
         $member_id = $this->session->userdata('member_id');//member_idを取得する
-        $targets = $this->Target_model->findByIdAndYear(100, 2200);//post時のtargetを連想配列で受け取る
+        $targets = $this->Target_model->findByIdAndYear($member_id, $year);//post時のtargetを連想配列で受け取る
         if (count($targets) < 4) {//db内にtargetが3つ以下であれば通す
             return TRUE;
         } else {
