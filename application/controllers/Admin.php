@@ -26,7 +26,7 @@
         /**
          * 引数に整数のみ受け付ける条件
          */
-        private function argumentCheck(int $id)//if文の条件を共通化
+        private function argumentCheck($id)//if文の条件を共通化(ユーザからダイレクトで受け取るため型宣言できない)
         {
             return !is_numeric($id) || intval($id) < 1;//returnしないと正常に動かない。
         }
@@ -165,7 +165,7 @@
         /**
          * 社員情報の編集作業
          */
-        public function member_edit(int $member_id)//sessionを用いるため引数にmember_idは含めない
+        public function member_edit($member_id)//sessionを用いるため引数にmember_idは含めない
         {
             if ($this->argumentCheck($member_id)) {//member_idが1以上の整数か判断する
                 redirect('login/admin');
@@ -257,7 +257,7 @@
          * 社員削除処理
          * @param type $id
          */
-        public function delete(int $id)//削除するidをパラメータより取得
+        public function delete($id)//削除するidをパラメータより取得
         {
             if ($this->argumentCheck($id)) {//$idが整数ではなく、マイナスである場合の条件分岐
                 redirect('user/logout');

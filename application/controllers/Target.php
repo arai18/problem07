@@ -27,7 +27,7 @@ class Target extends CI_Controller {
     /**
     * 引数に整数のみ受け付ける条件
     */
-    private function argumentCheck(int $year, int $term)//if文の条件を共通化
+    private function argumentCheck($year, $term)//if文の条件を共通化
     {
         return !is_numeric($year) || intval($year) < 1 || !is_numeric($term) || intval($term) < 1;//returnしないと正常に動かない。
     }
@@ -77,7 +77,7 @@ class Target extends CI_Controller {
     /**
      *  目標の編集
      */
-    public function edit(int $year, int $term)
+    public function edit($year, $term)
     { 
         $this->form_validation->set_rules('year', '年度', 'required|regex_match[/^[0-9]{4}$/]|callback_year_edit_check');
         $this->form_validation->set_rules('term', '期間', 'required|callback_term_edit_check');
@@ -125,7 +125,7 @@ class Target extends CI_Controller {
     /**
      * 目標の削除
      */
-    public function delete(int $year, int $term) 
+    public function delete($year, $term) 
     {
         if ($this->argumentCheck($year, $term)) {
             redirect('member/logout');

@@ -15,7 +15,7 @@
         /**
          * 引数に整数のみ受け付ける条件
          */
-        private function argumentCheck(int $id)//if文の条件を共通化
+        private function argumentCheck($id)//if文の条件を共通化
         {
             return !is_numeric($id) || intval($id) < 1;//returnしないと正常に動かない。
         }
@@ -23,7 +23,7 @@
         /**
          * adminのview統合表示
          */
-        private function showView(string $subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す
+        private function showView(string $subView, $subData = '')//引数にコンテンツビューと渡すデータを渡す(ユーザが入力できる引数では無いので型宣言できる)
         {
             $content = $this->load->view($subView, $subData, true);//コンテンツビューを文字列で取得する
             $data = [];
@@ -55,7 +55,7 @@
         /**
          * 部署名の編集
          */
-        public function edit(int $id)
+        public function edit($id)
         {
             $this->form_validation->set_rules('name', '部署名', 'required|callback_name_check');
             //validationメッセージ
@@ -97,7 +97,7 @@
         /**
          * 部署名を削除
          */
-        public function delete(int $id)
+        public function delete($id)
         {
            if ($this->argumentCheck($id)) {
                 redirect('admin/logout');
