@@ -8,6 +8,8 @@
     <body>
         <a href="/admin/member_index">社員一覧</a>
         <a href="/admin/member_add">社員登録</a>
+        <a href="/admin/index">Admin一覧</a>
+        <a href="/admin/add">Admin登録</a>
         <a href="/admin/edit">admin情報変更</a>
         <a href="/admin/edit_password">パスワード変更</a>
         <a href="/division/index">部署名一覧</a>

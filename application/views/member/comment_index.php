@@ -2,8 +2,6 @@
 
 <h1>コメント一覧</h1>
 
-<h2><a href="/comment/add/<?php echo $target->id; ?>">コメント登録</a></h2>
-
 <h3><?php echo $target->year; ?>年度</h3>
 <table border="1">
     <tr>
@@ -45,8 +43,6 @@
         <th>No</th>
         <th>コメント</th>
         <th>投稿者</th>
-        <th>編集</th>
-        <th>削除</th>
         <th>投稿日時</th>
         <th>更新日時</th>
     </tr>
@@ -60,8 +56,6 @@
         <td><?php echo $count; ?></td>
         <td><?php echo $comment->comment; ?></td>
         <td><?php echo $comment->admin->name; ?></td>
-        <td><a href="/comment/edit/<?php echo $comment->id; ?>">編集</a></td>
-        <td><a href="/comment/delete/<?php echo $comment->id; ?>">削除</a></td>
         <td>
             <?php 
                 $createdTime = $comment->created;

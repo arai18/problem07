@@ -107,6 +107,41 @@
         }
         
         /**
+        * コメントの表示
+        */
+        public function comment_index($target_id) 
+        {
+            $data = [];
+            $target = $this->Target_model->findById($target_id);
+
+            switch ($target->term) {//termを該当の期間に上書きする
+                case 1:
+                    $target->term = '4~6月';
+                    break;
+                case 2:
+                    $target->term = '7~9月';
+                    break;
+                case 3:
+                    $target->term = '10~12月';
+                    break;
+                case 4:
+                    $target->term = '1~3月';
+                    break;
+                default ://街灯がない場合は不正アクセス
+                    $this->session->sess_destroy();
+                    show_404();
+            }
+            $data['target'] = $target;
+            $comments = $this->Comment_model->findByTargetId($target_id);
+            foreach ($comments as $comment) {
+                $admin = $this->Admin_model->findById($comment->admin_id);//ここの理解ができていない!
+                $comment->admin = $admin;
+            }
+            $data['comments'] = $comments;
+            $this->showView('member/comment_index', $data);
+        }
+        
+        /**
          * コールバック処理
          * 
          * emailのvalidation設定

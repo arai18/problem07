@@ -5,7 +5,8 @@
         /**
          * ログインセッション(admin_id)の確認
          */
-        public function __construct() {
+        public function __construct() 
+        {
             parent::__construct();
             if (!$this->session->userdata('admin_id')) {
                 redirect('logout/admin');
@@ -128,4 +129,3 @@
             }
         }
     }
-

@@ -18,6 +18,8 @@
             
             <?php echo form_submit('submit', 'ログイン'); ?><br />
         <?php echo form_close(); ?>
+            
+        <a href="/forget_password/member_send_email">パスワードを忘れてしまった方</a>
     </body>
 </html>
 
