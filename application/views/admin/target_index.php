@@ -1,7 +1,7 @@
 <?php echo $this->session->flashdata('flash_message');?>
 
 <h1>目標一覧</h1>
-<h2><a href="/target/add">目標追加</a></h2>
+<h2><?php echo $member->first_name . $member->last_name . "さん"?></h2>
 
 <?php if (!$targets): ?>
     <p>まだ目標が登録されていません。</p>
@@ -13,8 +13,6 @@
                 <th>No</th>
                 <th>期間</th>
                 <th>目標</th>
-                <th>編集</th>
-                <th>削除</th>
                 <th>コメント</th>
                 <th>作成日時</th>
                 <th>更新日時</th>
@@ -40,13 +38,14 @@
                                 case 4:
                                     echo '1~3月';
                                     break;
+                                default ://街灯がない場合は不正アクセス
+                                    $this->session->sess_destroy();
+                                    show_404();
                             }
                         ?>
                     </td>
                     <td><?php echo $target->target;?></td>
-                    <td><a href="/target/edit/<?php echo $target->year?>/<?php echo $target->term?>">編集</a></td>
-                    <td><a href="/target/delete/<?php echo $target->year?>/<?php echo $target->term?>" class="delete">削除</a></td>
-                    <td><a href="/member/comment_index/<?php echo $target->id; ?>">コメント</a></td>
+                    <td><a href="/comment/index/<?php echo $target->id; ?>">コメント</a></td>
                     <td>
                         <?php
                             $createdTime = $target->created;

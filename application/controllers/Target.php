@@ -41,7 +41,7 @@ class Target extends CI_Controller {
         $member_id = $this->session->userdata('member_id');
         $data = [];
         $data['years'] = $this->Target_model->distinctYear($member_id);//重複しないyearを連想配列で取得する
-        $data['targets'] = $this->Target_model->findById($member_id);//member_idに対応した情報を取得
+        $data['targets'] = $this->Target_model->findByMemberId($member_id);//member_idに対応した情報を取得
         $this->showView('target/index', $data);
     }
     
@@ -144,7 +144,7 @@ class Target extends CI_Controller {
     public function year_add_check($year)
     {
         $member_id = $this->session->userdata('member_id');//member_idを取得する
-        $targets = $this->Target_model->findByIdAndYear($member_id, $year);//post時のtargetを連想配列で受け取る
+        $targets = $this->Target_model->findByMemberIdAndYear($member_id, $year);//post時のtargetを連想配列で受け取る
         if (count($targets) < 4) {//db内にtargetが3つ以下であれば通す
             return TRUE;
         } else {
@@ -158,7 +158,7 @@ class Target extends CI_Controller {
     public function year_edit_check($year)
     {
         $member_id = $this->session->userdata('member_id');
-        $targets = $this->Target_model->findByIdAndYear($member_id, $year);//post時のtargetを連想配列で受け取る→エラー処理なし  
+        $targets = $this->Target_model->findByMemberIdAndYear($member_id, $year);//post時のtargetを連想配列で受け取る→エラー処理なし  
         $postBeforeYear = $this->session->userdata('year');//post前のyearをeditの引数からsessionを通して取得する
         foreach ($targets as $target) {
             //返り値の配列が4以下でpost前とpost時とyearが同じ場合(何も変更しないで編集した場合) || 返り値の配列が3以下でpost前とpost時のyearが違う場合

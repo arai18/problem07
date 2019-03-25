@@ -12,11 +12,20 @@
         }
         
         /**
+         * idによる検索
+         */
+        public function findById($id)
+        {
+            $query = 'select * from targets where id = ?';
+            return $this->db->query($query, $id)->row();
+        }
+
+        /**
          * $member_idにヒットするユーザ情報を全て取得する。
          * @param type $member_id
          * @return type
          */
-        public function findById(int $member_id)//member_idで該当するもの全てを取得して、yearカラムの降順且つtermカラムの昇順で並び替える。
+        public function findByMemberId(int $member_id)//member_idで該当するもの全てを取得して、yearカラムの降順且つtermカラムの昇順で並び替える。
         {
             $query = 'select * from targets where member_id = ? order by year desc, term asc';
             return $this->db->query($query, $member_id)->result();
@@ -43,7 +52,7 @@
         /**
          * member_idとyearで検索し該当targetを取得する。
          */
-        public function findByIdAndYear($member_id, $year)//valildationのcallback関数で使うため型宣言できない。
+        public function findByMemberIdAndYear($member_id, $year)//valildationのcallback関数で使うため型宣言できない。
         {
             $query = 'select * from targets where member_id = ? and year = ?';
             return $this->db->query($query, [$member_id, $year])->result();

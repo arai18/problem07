@@ -5,7 +5,8 @@
         /**
          * ログインセッションの条件分岐
          */
-        public function __construct() {
+        public function __construct() 
+        {
             parent::__construct();
             if (!$this->session->userdata('admin_id')) {
                 redirect('logout/admin');
@@ -44,7 +45,7 @@
             $this->form_validation->set_message('valid_email', '【{field}】の入力形式が違います');
             $this->form_validation->set_message('is_unique', 'この【{field}】は既に登録済みです');
             
-            if ($this->form_validation->run() == FALSE) {
+            if ($this->form_validation->run() === FALSE) {
                 $this->load->view('admin/add');//バリデーションに引っかかった場合にviewを返す
             } else {
                 $admin = [
@@ -59,6 +60,7 @@
                     show_404();
                 }
                 $this->session->set_userdata('admin_id', $admin->id);//sessionにadmin_idを持たせる
+                $this->session->set_userdata('initialPassword', $admin->password);//初期パスワードを持たせる
                 $this->session->set_flashdata('flash_message', '新しいadminを登録しました');
                 redirect('admin/member_index');//redirectメソッドでmember/indexへリダイレクトさせる
             }
@@ -222,37 +224,85 @@
                 }
             }
         }
+        
+        /**
+         * passwordの更新処理
+         * 
+         */
+        public function edit_password()
+        {
+            $this->form_validation->set_rules('old_password', '現在のパスワード', 'required|callback_old_password_check');//現在のパスワードが一致しているか確認する。
+            $this->form_validation->set_rules('new_password', '新しいパスワード', 'required|callback_new_password_check');//現在のパスワードと新規のパスワードが一致していないか確認する。
+            //validationメッセージ
+            $this->form_validation->set_message('required', '【{field}】が未入力です');
+            $this->form_validation->set_message('old_password_check', '【{field}】正しくありません');
+            $this->form_validation->set_message('new_password_check', '【{field}】が【現在のパスワード】と同じため変更してください。');
+            
+            if ($this->form_validation->run() === FALSE) {
+                $this->showView('admin/edit_password');//パスワード変更リンクも表示される。                    
+            } else {
+                $admin_id = $this->session->userdata('admin_id');
+                $updatedPassword = $this->input->post('new_password');//新規パスワードをpostで受け取る
+                $this->Admin_model->updatePassword($updatedPassword, $admin_id);//dbへ新規パスワードをupdateする
+                $this->session->set_flashdata('flash_message', 'パスワードを変更しました');
+                redirect('admin/member_index');//target/indexにリダイレクトする
+            }
+        }
+        
+        /**
+         * adminの一覧表示
+         */
+        public function index()
+        {
+            $admins = $this->Admin_model->findAll();
+            $data = [];
+            $data['admins'] = $admins;
+            $this->showView('admin/index', $data);
+        }
 
         /**
          * 登録社員の一覧表示
          */
         public function member_index()
         {
-            $members = $this->Member_model->findAll();//配列でmemberのオブジェクトデータを取得する
-            if (!$members) {//社員がnullの場合
-                $this->session->sess_destroy();
-                show_404();
-            } else {
-                foreach ($members as $member) {//配列の要素を$memberに代入する          
-                    $division = $this->Division_model->findById($member->division_id);//配列要素で取れた$memberのdivision_idキーでidを取り出し、dbで検索し、divisionデータを取り出す。
-                    if (!$division) {//nullの場合
-                        $this->session->sess_destroy();
-                        show_404();
-                    }
-                    $member->division = $division;//divisionデータを$member->divisionに代入する
-                    $position = $this->Position_model->findById($member->position);
-                    if (!$position) {
-                        $this->session->sess_destroy();
-                        show_404();
-                    }
-                    $member->position = $position;
+            $members = $this->Member_model->findAll();//配列でmemberのオブジェクトデータを取得す
+            foreach ($members as $member) {//配列の要素を$memberに代入する          
+                $division = $this->Division_model->findById($member->division_id);//配列要素で取れた$memberのdivision_idキーでidを取り出し、dbで検索し、divisionデータを取り出す。
+                if (!$division) {//db取得でrow()を返すため、findById()の引数が一致しない場合にnullが返り次の処理でphpエラーが発生するため。
+                    $this->session->sess_destroy();
+                    show_404();
                 }
-                $data = [];
-                $data['members'] = $members;
-                $this->showView('admin/member_index', $data);
-            } 
+                $member->division = $division;//divisionデータを$member->divisionに代入する
+                $position = $this->Position_model->findById($member->position);
+                if (!$position) {//上記と同様
+                    $this->session->sess_destroy();
+                    show_404();
+                }
+                $member->position = $position;
+            }
+            $data = [];
+            $data['members'] = $members;
+            $this->showView('admin/member_index', $data);
         }
         
+        /**
+         * 社員目標表示処理
+         */
+        public function target_index($member_id)//member_index.phpからパラメータでidを受け取る
+        {
+            if ($this->argumentCheck($member_id)) {
+                redirect('logout/admin');
+            } else {
+                $data = [];
+                $data['member'] = $this->Member_model->findById($member_id);
+                $data['years'] = $this->Target_model->distinctYear($member_id);//重複しないyearを連想配列で取得する
+                $data['targets'] = $this->Target_model->findByMemberId($member_id);//member_idに対応した情報を取得
+                $this->session->set_userdata('member_id', $member_id);
+                $this->showView('admin/target_index', $data);
+            }
+        }
+
+
         /**
          * 社員削除処理
          * @param type $id
@@ -260,7 +310,7 @@
         public function delete($id)//削除するidをパラメータより取得
         {
             if ($this->argumentCheck($id)) {//$idが整数ではなく、マイナスである場合の条件分岐
-                redirect('user/logout');
+                redirect('logout/admin');
             } else {
                 $this->Member_model->destroy($id);//Member_modelのdeleteメソッドを実行する
                 $this->session->set_flashdata('flash_message', '社員を削除しました');
@@ -279,7 +329,9 @@
         }
         
         /**
-         * コールバック処理(adminのemail_validation)
+         * コールバック処理
+         *  
+         * check_the_same_email
          */
         public function admin_email_check($email)
         {
@@ -299,7 +351,7 @@
         }
         
         /**
-         * コールバック処理(memberのemail_validation)
+         * memberのemail_validation
          */
         public function member_email_check($email)
         {
@@ -322,5 +374,43 @@
                 return FALSE;
             }
         }  
+        
+        /**
+         * Adminのold_password_commpare
+         */
+        public function old_password_check($password)
+        {
+            $id = $this->session->userdata('admin_id');//sessionからmember_idを取得する
+            $adminBySession = $this->Admin_model->findById($id);//$idからmemberデータを取得する
+            if (!$adminBySession) {//nullの場合
+                $this->session->sess_destroy();
+                show_404();
+            }
+            $hashedOldPassword = $this->utility->getHash($password, $adminBySession->created);//post時のpasswordでハッシュ化
+            if ($hashedOldPassword === $adminBySession->password) {//post前とpost時のpasswordを比較する
+                return TRUE;
+            } else {
+                return FALSE;
+            }
+        }
+
+        /**
+         * Adminのnew_password_commpare
+         */
+        public function new_password_check($password)
+        {
+            $id = $this->session->userdata('admin_id');//sessionからmember_idを取得する
+            $adminBySession = $this->Admin_model->findById($id);//$idからmemberデータを取得する
+            if (!$adminBySession) {//nullの場合($memberBySession->passwordが取得できないため)
+                $this->session->sess_destroy();
+                show_404();
+            }
+            $hashedNewPassword = $this->utility->getHash($password, $adminBySession->created);//post時のpasswordでハッシュ化
+            if ($hashedNewPassword !== $adminBySession->password) {//post前とpost時のpasswordを比較する
+                return TRUE;
+            } else {
+                return FALSE;
+            }
+        }
     }
        

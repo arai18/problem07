@@ -30,11 +30,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 }
                 if ($admin->password === $this->utility->getHash($login['password'], $admin->created)) {//user.passwordを比較する
                     $this->session->set_userdata('admin_id', $admin->id);//userがある場合はsessionをセットしてmember/indexへリダイレクト
-                    $this->session->set_flashdata('flash_message', 'ログインに成功しました');//ログイン成功時のflashdataを設定
+                    if ($this->session->userdata('initialPassword') === $this->utility->getHash($login['password'], $admin->created)) {
+                        $this->session->set_flashdata('flash_message', 'ログインに成功しました。初回ログインのためパスワードを変更してください。');
+                    } else {
+                        $this->session->set_flashdata('flash_message', 'ログインに成功しました。');
+                    }
                     redirect('admin/member_index');
                 } else {
                     $this->session->set_flashdata('flash_message', 'メールアドレスまたはパスワードが一致しません');
-                    exit;
                     redirect('login/admin');//userがない場合はuser/loginへリダイレクト
                 }    
             }        

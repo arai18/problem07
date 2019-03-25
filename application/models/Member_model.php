@@ -61,7 +61,7 @@ class Member_model extends CI_Model{
     /**
      * emailによりmemberデータを取得する
      */
-    public function findByEmail(string $email)
+    public function findByEmail($email)//memberのcallback関数で使用するので型宣言できない。→$emailはpostで受け取る
     {
         $query = 'select * from members where email = ?';
         return $this->db->query($query, $email)->row();
@@ -110,6 +110,15 @@ class Member_model extends CI_Model{
         $query = 'update members set password = ? where id = ?';
         $getMember = $this->Member_model->findById($member_id);
         $this->db->query($query, [$this->utility->getHash($password, $getMember->created), $member_id]);
+    }
+    
+    /**
+     * トークン保存
+     */
+    public function createToken($id)
+    {
+        $query = 'update members set token = ?, create_token_time = now() where id = ?';
+        $this->db->query($query, [sha1(time()), $id]);
     }
 
     /**
